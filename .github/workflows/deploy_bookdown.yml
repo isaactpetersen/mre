@@ -3,7 +3,7 @@
 on:
   push:
      branches:
-       - crc-press
+       - testing
 
 name: build-pdf
 
