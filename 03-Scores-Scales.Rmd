@@ -9,11 +9,13 @@ It is important to consider the different [types of data](#dataTypes) because th
 ### Load Libraries {#loadLibraries-scoresScales}
 
 ```{r}
-library("petersenlab") #to install: install.packages("remotes"); remotes::install_github("DevPsyLab/petersenlab")
-library("dplyr")
+library("petersenlab")
+library("MOTE")
+library("here")
 library("tidyverse")
 library("tinytex")
 library("knitr")
+library("kableExtra")
 library("rmarkdown")
 library("bookdown")
 ```
@@ -23,9 +25,6 @@ library("bookdown")
 #### Simulate Data {#simulateData-scoresScales}
 
 For this example, I simulate data below.\index{simulate data}
-For reproducibility, I set the seed below.
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
 
 ```{r}
 set.seed(52242)
@@ -111,7 +110,7 @@ Raw scores are the purest because they are closest to the original operation (e.
 A disadvantage of raw scores is that they are scale dependent, and therefore they may not be comparable across different measures with different scales.\index{data!raw}
 An example histogram of raw scores is in Figure \@ref(fig:rawScores).\index{data!raw}\index{histogram}
 
-```{r rawScores, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Raw Scores."}
+```{r rawScores, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Raw Scores."}
 hist(scores$rawData,
      xlab = "Raw Scores",
      main = "Histogram of Raw Scores")
@@ -235,7 +234,7 @@ scores$percentileRank <-
 
 A histogram of percentile rank scores is in Figure \@ref(fig:percentileRanks).\index{data!percentile rank}\index{histogram}
 
-```{r percentileRanks, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Percentile Ranks."}
+```{r percentileRanks, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Percentile Ranks."}
 hist(scores$percentileRank,
      xlab = "Percentile Ranks",
      main = "Histogram of Percentile Ranks")
@@ -254,7 +253,7 @@ For example, the frequency of hallucinations among people would show a positivel
 For instance, consider a hypothetical distribution of hallucinations.
 It might follow a folded distribution, as depicted in Figure \@ref(fig:foldedDistribution):\index{data!nonnormally distributed}\index{histogram}
 
-```{r foldedDistribution, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Hallucinations (Raw Score)."}
+```{r foldedDistribution, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Hallucinations (Raw Score)."}
 hist(rbinom(100000, 300, .01),
      breaks = 8,
      xlab = "Hallucinations (Raw Score)",
@@ -263,7 +262,7 @@ hist(rbinom(100000, 300, .01),
 
 Now consider the same distribution converted to a standardized (*z*) score, as depicted in Figure \@ref(fig:foldedDistributionZscore):\index{data!standardized}\index{data!\textit{z} score}\index{histogram}
 
-```{r foldedDistributionZscore, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Hallucinations (z Score)."}
+```{r foldedDistributionZscore, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Hallucinations (z Score)."}
 hist(scale(rbinom(100000, 300, .01)),
      breaks = 8,
      xlab = "Hallucinations (z Score)",
@@ -286,13 +285,12 @@ The area under a normal curve within one standard deviation of the mean is calcu
 
 ```{r}
 stdDeviations <- 1
-
 pnorm(stdDeviations) - pnorm(stdDeviations * -1)
 ```
 
 The area under a normal curve within one standard deviation of the mean is depicted in Figure \@ref(fig:zScoreDensity1SD).\index{data!standardized}
 
-```{r zScoreDensity1SD, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Density of Standard Normal Distribution. The blue region represents the area within one standard deviation of the mean."}
+```{r zScoreDensity1SD, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Density of Standard Normal Distribution. The gray region represents the area within one standard deviation of the mean."}
 x <- seq(-4, 4, length = 200)
 y <- dnorm(x, mean = 0, sd = 1)
 plot(x, y, type = "l",
@@ -303,20 +301,19 @@ x <- seq(stdDeviations * -1, stdDeviations, length = 100)
 y <- dnorm(x, mean = 0, sd = 1)
 polygon(c(stdDeviations * -1, x, stdDeviations),
         c(0, y, 0),
-        col = "blue")
+        col = "gray")
 ```
 
 The area under a normal curve within two standard deviations of the mean is calculated below:\index{data!standardized}
 
 ```{r}
 stdDeviations <- 2
-
 pnorm(stdDeviations) - pnorm(stdDeviations * -1)
 ```
 
 The area under a normal curve within two standard deviations of the mean is depicted in Figure \@ref(fig:zScoreDensity2SD).\index{data!standardized}
 
-```{r zScoreDensity2SD, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Density of Standard Normal Distribution. The blue region represents the area within two standard deviations of the mean."}
+```{r zScoreDensity2SD, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Density of Standard Normal Distribution. The gray region represents the area within two standard deviations of the mean."}
 x <- seq(-4, 4, length = 200)
 y <- dnorm(x, mean = 0, sd = 1)
 plot(x, y, type = "l",
@@ -327,20 +324,19 @@ x <- seq(stdDeviations * -1, stdDeviations, length = 100)
 y <- dnorm(x, mean = 0, sd = 1)
 polygon(c(stdDeviations * -1, x, stdDeviations),
         c(0, y, 0),
-        col = "blue")
+        col = "gray")
 ```
 
 The area under a normal curve within thee standard deviations of the mean is calculated below:\index{data!standardized}
 
 ```{r}
 stdDeviations <- 3
-
 pnorm(stdDeviations) - pnorm(stdDeviations * -1)
 ```
 
 The area under a normal curve within three standard deviations of the mean is depicted in Figure \@ref(fig:zScoreDensity3SD).\index{data!standardized}
 
-```{r zScoreDensity3SD, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Density of Standard Normal Distribution. The blue region represents the area within three standard deviations of the mean."}
+```{r zScoreDensity3SD, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Density of Standard Normal Distribution. The gray region represents the area within three standard deviations of the mean."}
 x <- seq(-4, 4, length = 200)
 y <- dnorm(x, mean = 0, sd = 1)
 plot(x, y, type = "l",
@@ -351,7 +347,7 @@ x <- seq(stdDeviations * -1, stdDeviations, length = 100)
 y <- dnorm(x, mean = 0, sd = 1)
 polygon(c(stdDeviations * -1, x, stdDeviations),
         c(0, y, 0),
-        col = "blue")
+        col = "gray")
 ```
 
 Alternatively, if you want to determine the *z* score associated with a particular percentile in a normal distribution, you can use the `qnorm()` function.\index{data!standardized}\index{data!\textit{z} score}\index{data!percentile rank}
@@ -373,18 +369,13 @@ where $x$ is the observed score, $\mu$ is the mean observed score, and $\sigma$ 
 
 ```{r}
 scores$zScore <- scale(scores$rawData)
-
-all.equal(
-  as.vector(scores$zScore),
-  (scores$rawData - mean(scores$rawData, na.rm = TRUE)) / 
-    sd(scores$rawData, na.rm = TRUE))
 ```
 
 An example histogram of *z* scores is in Figure \@ref(fig:zScores).\index{data!standardized}\index{data!\textit{z} score}\index{histogram}
 
 (ref:zScores) Histogram of *z* Scores.
 
-```{r zScores, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "(ref:zScores)"}
+```{r zScores, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "(ref:zScores)"}
 hist(scores$zScore,
      xlab = "z Scores",
      main = "Histogram of z Scores")
@@ -413,7 +404,7 @@ An example histogram of *T* scores is in Figure \@ref(fig:tScores).\index{data!\
 
 (ref:tScores) Histogram of *T* Scores.
 
-```{r tScores, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "(ref:tScores)"}
+```{r tScores, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "(ref:tScores)"}
 hist(scores$tScore,
      xlab = "T Scores",
      main = "Histogram of T Scores")
@@ -440,7 +431,7 @@ scores$standardScore <- 100 + 15*scale(scores$rawData)
 
 An example histogram of standard scores is in Figure \@ref(fig:standardScores).\index{data!standardized}\index{data!standard score}\index{histogram}
 
-```{r standardScores, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Standard Scores."}
+```{r standardScores, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Standard Scores."}
 hist(scores$standardScore,
      xlab = "Standard Scores",
      main = "Histogram of Standard Scores")
@@ -467,7 +458,7 @@ scores$scaledScore <- 10 + 3*scale(scores$rawData)
 
 An example histogram of scaled scores is in Figure \@ref(fig:scaledScores).\index{data!standardized}\index{data!scaled score}\index{histogram}
 
-```{r scaledScores, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Scaled Scores."}
+```{r scaledScores, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Scaled Scores."}
 hist(scores$scaledScore,
      xlab = "Scale Scores",
      main = "Histogram of Scaled Scores")
@@ -497,7 +488,8 @@ names(stanineConverstionTable) <- c("Stanine","Bracketed Percent","Cumulative Pe
 ```{r stanineCalculation, echo = FALSE}
 kable(stanineConverstionTable,
       caption = "Table for Calculating Stanine Scores",
-      booktabs = TRUE)
+      booktabs = TRUE,
+      linesep = "")
 ```
 
 ```{r}
@@ -522,7 +514,7 @@ scores$stanineScore[which(scores$percentileRank > 96)] <- 9
 
 A histogram of stanine scores is in Figure \@ref(fig:stanineScores).\index{data!standardized}\index{data!stanine score}\index{data!histogram}
 
-```{r stanineScores, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Histogram of Stanine Scores."}
+```{r stanineScores, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Histogram of Stanine Scores."}
 hist(scores$stanineScore,
      xlab = "Stanine Scores",
      main = "Histogram of Stanine Scores",
@@ -539,5 +531,3 @@ It is also important to consider whether the data were [transformed](#scoreTrans
 ## Suggested Readings {#readings-scoresScales}
 
 @Childs2021: https://dzchilds.github.io/stats-for-bio/data-transformations.html (archived at https://perma.cc/3YEB-QW2V)
-
-## Exercises {#exercises-scoresScales}

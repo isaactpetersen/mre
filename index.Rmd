@@ -1,16 +1,22 @@
 ---
 title: "Principles of Psychological Assessment: With Applied Examples in R"
-subtitle: "version 1.0.5"
 author: "Isaac T. Petersen"
 date: "`r Sys.Date()`"
-site: bookdown::bookdown_site
-documentclass: book
+documentclass: krantz
+classoption: krantz2
 bibliography: [book.bib, packages.bib]
-csl: apa.csl
 link-citations: yes
+colorlinks: yes
+fontsize: 10pt
+monofont: "Source Code Pro"
+monofontoptions: "Scale=0.65"
+lot: yes
+lof: yes
+site: bookdown::bookdown_site
 description: "This is a textbook on *Principles of Psychological Assessment*. The goal of this book is to provide computational examples to apply principles of psychological assessment into practice."
 url: 'https\://isaactpetersen.github.io/Principles-Psychological-Assessment/'
 github-repo: isaactpetersen/Principles-Psychological-Assessment
+graphics: yes
 cover-image: "Images/cover.png"
 ---
 
@@ -84,11 +90,16 @@ knitr::opts_chunk$set(
   comment = "", #for accessibility: https://bookdown.org/yihui/rmarkdown-cookbook/html-accessibility.html
   dev = "png",
   dev.args = list(type = "cairo-png")) #plot anti-aliasing using cairo-png
+
+options(
+  htmltools.dir.version = FALSE,
+  formatR.indent = 2,
+  width = 72,
+  digits = 4,
+  continue = "  ",
+  tinytex.verbose = TRUE
+)
 ```
-
-# Book Cover {-}
-
-![book cover](Images/cover.png)
 
 ```{r include = FALSE}
 # Working title:

@@ -1,14 +1,11 @@
 # From: https://orchid00.github.io/actions_sandbox/websites-using-pkgdown-bookdown-and-blogdown.html#deploy-bookdown
-# To Do:
-# 1. Create a personal access token (PAT) labeled `EMAIL`: https://github.com/settings/tokens; save the value in LastPass
-# 2. Create a secret labeled `EMAIL` in the repo (Settings -> Security -> Secrets -> Actions), and copy the PAT for `EMAIL` into the secret labeled `EMAIL`
 
 on:
   push:
      branches:
-       - main
+       - crc-press
 
-name: build-book
+name: main
 
 jobs:
   bookdown:
@@ -32,6 +29,21 @@ jobs:
       - name: Install libcurl on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get update -y && sudo apt-get install -y libcurl4-openssl-dev
+
+      - name: Install tinytex
+        uses: r-lib/actions/setup-tinytex@v2 # update
+
+      #- name: Install additional LaTeX packages
+      #  run: |
+          #tlmgr install url
+          #tlmgr install underscore
+        
+      - name: Install Google fonts
+        run: |
+          wget -O Source_Code_Pro.zip https://fonts.google.com/download?family=Source%20Code%20Pro
+          unzip -d source_code_pro/ Source_Code_Pro.zip
+          mv source_code_pro /usr/share/fonts/
+          fc-cache -fv
         
       - name: Install package dependencies
         uses: r-lib/actions/setup-r-dependencies@v2 # update
@@ -41,36 +53,9 @@ jobs:
       #   Rscript -e 'remotes::install_github("DevPsyLab/petersenlab")'
         
       - name: Render Book
-        run: Rscript -e 'bookdown::render_book("index.Rmd")'
+        run: Rscript -e 'bookdown::render_book("index.Rmd", output_format = c("all"))'
         
       - uses: actions/upload-artifact@v3 # update
         with:
           name: _book
           path: _book/
-
-# Need to first create an empty gh-pages branch
-# see https://pkgdown.r-lib.org/reference/deploy_site_github.html
-# and also add secrets for a GH_PAT and EMAIL to the repository
-# gh-action from Cecilapp/GitHub-Pages-deploy
-  checkout-and-deploy:
-   runs-on: ubuntu-latest
-   needs: bookdown
-   steps:
-     - name: Checkout
-       uses: actions/checkout@v3 # update
-
-     - name: Download artifact
-       uses: actions/download-artifact@v3 # update
-       with:
-         # Artifact name
-         name: _book # optional
-         # Destination path
-         path: _book # optional
-
-     - name: Deploy to GitHub Pages
-       uses: Cecilapp/GitHub-Pages-deploy@v3 # update
-       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-       with:
-          build_dir: _book/ # "_site/" by default
-          email: ${{ secrets.EMAIL }} # must be a verified email

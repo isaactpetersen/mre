@@ -2,7 +2,7 @@
 
 > "What we know depends on how we know it."
 
-## Overview of Validity {#overview-validity}
+## Overview {#overview-validity}
 
 According to the *Standards for Educational and Psychological Testing* [@AERA2014, p. 11], measurement validity is "the degree to which evidence and theory support the interpretations of test scores for proposed uses of tests."\index{validity!overview}\index{Standards for Educational and Psychological Testing}
 I summarized [reliability](#reliability) with three words: repeatability, consistency, and precision.\index{reliability}\index{reliability!repeatability}\index{reliability!consistency}\index{reliability!precision}
@@ -19,33 +19,31 @@ Below, we prepare the data to provide some validity-related examples throughout 
 ### Load Libraries {#loadLibraries-validity}
 
 ```{r}
-library("petersenlab") #to install: install.packages("remotes"); remotes::install_github("DevPsyLab/petersenlab")
+library("petersenlab")
 library("lavaan")
 library("semPlot")
 library("rockchalk")
 library("semTools")
 library("semPlot")
-library("kableExtra")
 library("MASS")
 library("psych")
 library("simstandard")
+library("DT")
 library("MOTE")
+library("here")
 library("tidyverse")
 library("tinytex")
 library("knitr")
+library("kableExtra")
 library("rmarkdown")
 library("bookdown")
-library("here")
-library("DT")
 ```
 
 ### Prepare Data {#prepareData-validity}
 
 #### Simulate Data {#simulateData-validity}
 
-For reproducibility, I set the seed below.\index{simulate data}
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
+\index{simulate data}
 
 ```{r}
 sampleSize <- 1000
@@ -345,7 +343,7 @@ As the maxim goes, correlation does not imply causation.\index{radical operation
 Just because $X$ is associated with Y does not mean that $X$ causes $Y$.\index{association!causation}\index{causality}
 Consider that you find an association between variables $X$ and $Y$, consistent with your hypothesis, as depicted in Figure \@ref(fig:commonCause1).\index{association!causation}\index{causality}
 
-```{r commonCause1, out.width = "100%", fig.align = "center", fig.cap = "Hypothesized Causal Effect Based on an Observed Association Between $X$ and $Y$, Such That $X$ Causes $Y$.", echo = FALSE}
+```{r commonCause1, out.width = "50%", fig.align = "center", fig.cap = "Hypothesized Causal Effect Based on an Observed Association Between $X$ and $Y$, Such That $X$ Causes $Y$.", echo = FALSE}
 knitr::include_graphics("./Images/commonCause_1.png")
 ```
 
@@ -353,7 +351,7 @@ There are three primary reasons that an observed association between $X$ and $Y$
 
 First, the association could reflect the opposite direction of effect, where $Y$ actually causes $X$, as depicted in Figure \@ref(fig:commonCause2).\index{association!causation}\index{direction of effect}\index{causality}
 
-```{r commonCause2, out.width = "100%", fig.align = "center", fig.cap = "Reverse (Opposite) Direction of Effect From the Hypothesized Effect, Where $Y$ Causes $X$.", echo = FALSE}
+```{r commonCause2, out.width = "50%", fig.align = "center", fig.cap = "Reverse (Opposite) Direction of Effect From the Hypothesized Effect, Where $Y$ Causes $X$.", echo = FALSE}
 knitr::include_graphics("./Images/commonCause_2.png")
 ```
 
@@ -362,7 +360,7 @@ If a third variable is a common cause of each and accounts for their association
 An observed association between $X$ and $Y$ could reflect a confound—i.e., a cause ($Z$) that influences both $X$ and $Y$, which explains why $X$ and $Y$ are correlated even though they are not causally related.\index{association!causation}\index{confound}\index{causality}
 A third variable confound that is a common cause of both $X$ and $Y$ is depicted in Figure \@ref(fig:commonCause3).\index{association!causation}\index{confound}\index{causality}
 
-```{r commonCause3, out.width = "100%", fig.align = "center", fig.cap = "Confounded Association Between $X$ and $Y$ due to a Common Cause, $Z$.", echo = FALSE}
+```{r commonCause3, out.width = "50%", fig.align = "center", fig.cap = "Confounded Association Between $X$ and $Y$ due to a Common Cause, $Z$.", echo = FALSE}
 knitr::include_graphics("./Images/commonCause_3.png")
 ```
 
@@ -387,9 +385,9 @@ By contrast, other events are still incredibly difficult to predict, including e
 Statistical models applied to big data (i.e., lots of variables and lots of samples) can *over-fit* the data, which means that the statistical model accounts for error variance (an overly specific prediction), which will not generalize to future samples.\index{over-fitting}
 So, even though an over-fitting statistical model appears to be accurate, it is not actually that accurate—it will predict new data less accurately than how accurately it accounts for the data with which the model was built.\index{over-fitting}\index{prediction}
 
-In Figure \@ref(fig:overfittingModel), the blue line represents the true distribution of the data, and the red line is an over-fitting model:\index{over-fitting}
+In Figure \@ref(fig:overfittingModel), the black line represents the true distribution of the data, and the gray line is an over-fitting model:\index{over-fitting}
 
-```{r overfittingModel, echo = FALSE, out.width = "100%", fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Over-fitting Model in Red Relative to the True Distribution of the Data in Blue."}
+```{r overfittingModel, echo = FALSE, out.width = "100%", fig.align = "center", fig.height = 8, fig.width = 8, fig.cap = "Over-fitting Model in Gray Relative to the True Distribution of the Data in Black."}
 sampleSize <- 200
 quadraticX <- rnorm(sampleSize)
 quadraticY <- quadraticX ^ 2 + rnorm(sampleSize)
@@ -406,8 +404,8 @@ loessNewData <- data.frame(quadraticX = seq(from = min(quadraticData$quadraticX)
 quadraticNewData$loessY <- predict(loessFit, newdata = quadraticNewData)
 
 plot(x = quadraticData$quadraticX, y = quadraticData$quadraticY, xlab = "", ylab = "")
-lines(quadraticNewData$quadraticY ~ quadraticNewData$quadraticX, lwd = 2, col = "blue")
-lines(quadraticNewData$loessY ~ quadraticNewData$quadraticX, lwd = 2, col = "red")
+lines(quadraticNewData$quadraticY ~ quadraticNewData$quadraticX, lwd = 2, col = "black")
+lines(quadraticNewData$loessY ~ quadraticNewData$quadraticX, lwd = 2, col = "gray")
 ```
 
 ###### Criterion Contamination {#criterionContamination}
@@ -461,7 +459,7 @@ Empiricists evaluate how an observed predictor relates to an observed outcome.\i
 The rectangles in the figure represent entities that can be observed.\index{empiricism}\index{radical operationalism}\index{path analysis}
 For instance, an empiricist might examine the extent to which a person's blood pressure is related to the number of words they speak per minute.\index{empiricism}\index{radical operationalism}
 
-```{r empiricism, out.width = "100%", fig.align = "center", fig.cap = "Conceptual Depiction of Empiricism.", echo = FALSE}
+```{r empiricism, out.width = "25%", fig.align = "center", fig.cap = "Conceptual Depiction of Empiricism.", echo = FALSE}
 knitr::include_graphics("./Images/empiricism.png")
 ```
 
@@ -474,10 +472,7 @@ knitr::include_graphics("./Images/psychoanalysis.png")
 Circles represent unobserved, latent entities.\index{latent variable}\index{path analysis}
 For instance a psychoanalyst may make a conceptual claim that one observed variable influences another observed variable through a complex chain of intervening processes that are unobservable.\index{psychoanalysis}\index{theory}\index{latent variable}
 
-There is a classic and hilarious [Monty Python video](https://osf.io/gc79d) (see below) that is an absurd example akin to radical operationalism taken to the extreme.\index{empiricism}\index{radical operationalism}
-
-![Monty Python video on penguin research](Images/montyPythonPenguinResearch.mp4){width=100%}
-
+There is a classic and hilarious [Monty Python video](https://osf.io/gc79d) that is an absurd example akin to radical operationalism taken to the extreme.\index{empiricism}\index{radical operationalism}
 In the video, the researchers make lots of measurements and predictions.\index{empiricism}\index{radical operationalism}
 The researchers identify interspecies differences in intelligence where humans show better performance on the English-based intelligence test (who got an IQ score of 100) than the penguins, who got an IQ score of 2.\index{empiricism}\index{radical operationalism}
 But the penguins did not speak English and were unable to provide answers to the English-based intelligence test.\index{empiricism}\index{radical operationalism}
@@ -544,7 +539,7 @@ Several aspects of psychometrics can be evaluated with an MTMM, including [relia
 The [reliability](#reliability) diagonal of an MTMM is the correlation of variable with itself, i.e., the [test–retest reliability](#testRetest-reliability) or monotrait-monomethod correlations.\index{multitrait-multimethod matrix}\index{validity!construct}\index{reliability}\index{reliability!test–retest}
 The [reliability](#reliability) coefficients should be the highest values in the matrix because each measure should be more correlated with itself than with anything else.\index{multitrait-multimethod matrix}\index{validity!construct}\index{reliability}\index{reliability!test–retest}
 
-(ref:campbellFiskeCaption) Multitrait-Multimethod Matrix. Figure reprinted from Campbell and Fiske [-@Campbell1959], Table 1, p. 82. Campbell, D. T., & Fiske, D. W. (1959). Convergent and discriminant validation by the multitrait-multimethod matrix. *Psychological Bulletin*, *56*, 81-105. [https://doi.org/10.1037/h0046016](https://doi.org/10.1037/h0046016)
+(ref:campbellFiskeCaption) Multitrait-Multimethod Matrix. Figure reprinted from Campbell and Fiske [-@Campbell1959], Table 1, p. 82. Campbell, D. T., \& Fiske, D. W. (1959). Convergent and discriminant validation by the multitrait-multimethod matrix. *Psychological Bulletin*, *56*, 81-105. [https://doi.org/10.1037/h0046016](https://doi.org/10.1037/h0046016). The content is in the public domain.
 
 ```{r campbellFiske, out.width = "100%", fig.align = "center", fig.cap = "(ref:campbellFiskeCaption)", echo = FALSE}
 knitr::include_graphics("./Images/campbellFiske.png")
@@ -591,7 +586,7 @@ For example, if extraversion and anxiety are moderately correlated with each oth
 
 You can estimate a measure's degree of discriminant validity based on the *heterotrait-monotrait ratio* [HTMT; @Henseler2015; @Roemer2021].\index{multitrait-multimethod matrix}\index{validity!construct}\index{validity!discriminant}
 HTMT is the average of the heterotrait-heteromethod correlations (i.e., the correlations of measures from different measurement methods that assess different constructs), relative to the average of the monotrait-heteromethod correlations (i.e., the correlations of measures from different measurement methods that assess the same construct).\index{multitrait-multimethod matrix}\index{validity!construct}\index{validity!discriminant}\index{methods!multiple}
-As described [here (http://www.henseler.com/htmt.html)](http://www.henseler.com/htmt.html) (archived at https://perma.cc/A9DU-WZWQ) based on evidence from @Voorhees2016,\index{multitrait-multimethod matrix}\index{validity!construct}\index{validity!discriminant}
+As described here (http://www.henseler.com/htmt.html; archived at https://perma.cc/A9DU-WZWQ) based on evidence from @Voorhees2016,\index{multitrait-multimethod matrix}\index{validity!construct}\index{validity!discriminant}
 
 > If the HTMT is clearly smaller than one, discriminant validity can be regarded as established.
 > In many practical situations, a threshold of 0.85 reliably distinguishes between those pairs of latent variables that are discriminant valid and those that are not.\index{multitrait-multimethod matrix}\index{validity!construct}\index{validity!discriminant}
@@ -637,7 +632,7 @@ In part, this may be because we need better measures (i.e., a higher ratio of co
 This example is courtesy of W. Joel Schneider.\index{multitrait-multimethod matrix}\index{validity!construct}
 First, we simulate data for an MTMM model using a fixed model with population parameters using the `simstandard` package [@R-simstandard]:\index{simulate data}\index{multitrait-multimethod matrix}\index{validity!construct}
 
-```{r, class.source = "fold-hide"}
+```{r}
 model_fixed <- '
  Verbal =~ .5*VO1 + .6*VO2 + .7*VO3 +
            .7*VW1 + .6*VW2 + .5*VW3 + 
@@ -669,28 +664,28 @@ MTMM_data <- sim_standardized(
   errors = FALSE)
 ```
 
-A multitrait-multimethod matrix correlation matrix is below.\index{multitrait-multimethod matrix}\index{validity!construct}
+A multitrait-multimethod matrix correlation matrix is in Table \@ref(tab:mtmmCorrelationPDF).\index{multitrait-multimethod matrix}\index{validity!construct}
 
-```{r, eval = FALSE}
-round(cor(MTMM_data), 2)
-```
+```{r mtmmCorrelationPDF, echo = FALSE}
+MTMM_corMatrix <- cor(MTMM_data) %>% 
+  specify_decimal(., 2) %>% 
+  suppressLeadingZero(.) %>% 
+  matrix(., nrow = ncol(MTMM_data), ncol = ncol(MTMM_data)) %>% 
+  data.frame()
 
-```{r mtmmCorrelationHTML, out.width = "100%", fig.align = "center", fig.cap = "Multitrait-Multimethod Correlation Matrix.", eval = knitr::is_html_output(excludes = "epub"), echo = knitr::is_html_output(excludes = "epub"), echo = FALSE}
-paged_table(data.frame(round(cor(MTMM_data), 2)))
-```
+names(MTMM_corMatrix) <- names(MTMM_data)
+row.names(MTMM_corMatrix) <- names(MTMM_data)
+  
+MTMM_corMatrix[upper.tri(MTMM_corMatrix)] <- ""
 
-```{r mtmmCorrelationPDF, out.width = "100%", fig.align = "center", fig.cap = "Multitrait-Multimethod Correlation Matrix.", eval = knitr::is_latex_output(), echo = knitr::is_latex_output(), echo = FALSE}
 kable(
-  data.frame(round(cor(MTMM_data), 2)),
+  MTMM_corMatrix,
+  caption = "Multitrait-Multimethod Correlation Matrix.",
   format = "latex",
-  booktabs = TRUE
+  booktabs = TRUE,
+  linesep = c("", "", "\\addlinespace")
   ) %>%
   kable_styling(latex_options = "scale_down")
-```
-
-```{r mtmmCorrelationEPUB, out.width = "100%", fig.align = "center", fig.cap = "Multitrait-Multimethod Correlation Matrix.", eval = knitr::is_html_output(excludes = c("markdown","html","html4","html5","revealjs","s5","slideous","slidy","gfm")), echo = knitr::is_html_output(excludes = c("markdown","html","html4","html5","revealjs","s5","slideous","slidy","gfm"))}
-kable(data.frame(round(cor(MTMM_data), 2)),
-      booktabs = TRUE)
 ```
 
 ###### Construct Validity Beyond Campbell and Fiske {#constructValidity-beyondCampbellFiske}
@@ -752,17 +747,11 @@ MTMM.fit <- cfa(
   data = MTMM_data,
   orthogonal = TRUE,
   missing = "ml")
-
-summary(
-  MTMM.fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
 ```
 
-A path diagram of the model is depicted in Figure \@ref(fig:mtmmCFAFigure) using the `semPlot` package [@R-semPlot].\index{multitrait-multimethod matrix}\index{multitrait-multimethod matrix!confirmatory factor analysis}\index{validity!construct}\index{factor analysis!confirmatory}
+A path diagram of the model can be generated using the `semPlot` package [@R-semPlot].\index{multitrait-multimethod matrix}\index{multitrait-multimethod matrix!confirmatory factor analysis}\index{validity!construct}\index{factor analysis!confirmatory}\index{structural equation modeling!path diagram}
 
-```{r mtmmCFAFigure, out.width = "100%", fig.align = "center", fig.height = 8, fig.cap = "Multitrait-Multimethod Model in Confirmatory Factor Analysis."}
+```{r, eval = FALSE}
 semPaths(
   MTMM.fit,
   what = "std",
@@ -792,28 +781,18 @@ model2 <- lm(
   criterion ~ oldpredictor + predictor,
   data = na.omit(mydataValidity))
 
-summary(model1)
-summary(model2)
-
 model1Rsquare <- summary(model1)$r.squared
 model2Rsquare <- summary(model2)$r.squared
 
-model1RsquareAdj <- summary(model1)$adj.r.squared
-model2RsquareAdj <- summary(model2)$adj.r.squared
+deltaRsquare <- model2Rsquare - model1Rsquare
 
-deltaRsquare <- getDeltaRsquare(model2)[["predictor"]]
-deltaRsquareAdj <- model2RsquareAdj - model1RsquareAdj
-
-deltaRsquareAdj
+deltaRsquare
 anova(model1, model2)
-getDeltaRsquare(model2)
 ```
 
-$\Delta R^2$ was calculated using the `rockchalk` package [@R-rockchalk].\index{validity!incremental}\index{prediction}
 The predictor shows significant incremental validity above the old predictor in predicting the criterion.\index{validity!incremental}\index{prediction}
 `Model 1` explains $`r round(model1Rsquare * 100, 2)`$% of the variance $(R^2 = `r round(model1Rsquare, 2)`)$, and `Model 2` explains $`r round(model2Rsquare * 100, 2)`$% of the variance $(R^2 = `r round(model2Rsquare, 2)`)$.\index{validity!incremental}\index{prediction}
 Thus, the predictor explains only $`r round(deltaRsquare * 100, 2)`$% additional variance in the criterion above the variance explained by the old predictor $(\Delta R^2)$.\index{validity!incremental}\index{prediction}
-Based on adjusted $R^2$ ($R^2_{adj}$), the predictor explains only $`r round(deltaRsquareAdj * 100, 2)`$% additional variance in the criterion above the variance explained by the old predictor ($\Delta R^2_{adj}$).\index{validity!incremental}\index{prediction}
 
 #### Treatment Utility of Assessment {#treatmentUtility}
 
@@ -1098,7 +1077,7 @@ So, [measurement error](#measurementError) in $x$ and $y$ can reduce the observe
 This is known as the *attenuation formula* (Equation \@ref(eq:attenuationFormula)):\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}
 
 $$
-\small
+\tiny
 \begin{aligned}
   r_{xy} &= r_{x_{t}y_{t}} \sqrt{r_{xx}r_{yy}} \\
   \text{observed association between } x \text{ and } y &= (\text{true association of constructs}) \times \sqrt{\text{reliability of } x \text{ and } y}
@@ -1126,77 +1105,13 @@ The attenuation and disattenuation formulas are based on [classical test theory]
 Nevertheless, the attenuation formula can be informative for understanding how imperiled your research is when your measures have low [reliability](#reliability) (i.e., when there is instability in the measure).\index{measurement error!attenuation of association}\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{reliability!problems of low reliability}
 Researchers recommend accounting for measurement [reliability](#reliability), to better estimate the association between constructs, either with the disattenuation formula [@Schmidt1996] or with [structural equation modeling](#sem), as described in the next chapter.\index{measurement error!attenuation of association}\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 
-### Test with Simulated Data {#measurementErrorEffects-simulatedData}
-
-#### Reliability of Predictor {#measurementErrorEffects-reliabilityPredictor}
-
-```{r}
-cor.test(
-  x = mydataValidity$predictorWithMeasurementErrorT1,
-  y = mydataValidity$predictorWithMeasurementErrorT2)
-```
-
-```{r, include = FALSE}
-reliabilityPredictor_sim <- 
-  cor.test(
-    x = mydataValidity$predictorWithMeasurementErrorT1,
-    y = mydataValidity$predictorWithMeasurementErrorT2)$estimate
-```
-
-#### Reliability of Criterion {#measurementErrorEffects-reliabilityCriterion}
-
-```{r}
-cor.test(
-  x = mydataValidity$criterionWithMeasurementErrorT1,
-  y = mydataValidity$criterionWithMeasurementErrorT2)
-```
-
-```{r, include = FALSE}
-reliabilityCriterion_sim <- 
-  cor.test(
-    x = mydataValidity$criterionWithMeasurementErrorT1,
-    y = mydataValidity$criterionWithMeasurementErrorT2)$estimate
-```
-
-#### True Association {#measurementErrorEffects-trueAssociation}
-
-```{r}
-cor.test(
-  x = mydataValidity$predictor,
-  y = mydataValidity$criterion)
-```
-
-```{r, include = FALSE}
-trueAssociation_sim <- 
-  cor.test(
-    x = mydataValidity$predictor,
-    y = mydataValidity$criterion)$estimate
-```
-
-#### Observed Association (After Adding Measurement Error) {#measurementErrorEffects-observedAssociation}
-
-```{r}
-cor.test(
-  x = mydataValidity$predictorWithMeasurementErrorT1,
-  y = mydataValidity$criterionWithMeasurementErrorT1)
-```
-
-```{r, include = FALSE}
-observedAssociation_sim <- 
-  cor.test(
-    x = mydataValidity$predictorWithMeasurementErrorT1,
-    y = mydataValidity$criterionWithMeasurementErrorT1)$estimate
-```
-
-Using simulated data, when the [reliability](#reliability) of the predictor is `r apa(reliabilityPredictor_sim, 2, leading = FALSE)`, the [reliability](#reliability) of the criterion is `r apa(reliabilityCriterion_sim, 2, leading = FALSE)`, and the true association between the predictor and criterion is $r = `r apa(trueAssociation_sim, 2, leading = FALSE)`$, the observed association is attenuated to $r = `r apa(observedAssociation_sim, 2, leading = FALSE)`$.\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
-
 ### Attenuation of True Correlation Due to Measurement Error {#attenuation}
 
 The attenuation formula is presented in Equation \@ref(eq:attenuationFormula).
 I extend it to a specific example in Equation \@ref(eq:attenuationFormulaExample):\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
 
 $$
-\small
+\tiny
 \begin{aligned}
   r_{xy} &= r_{x_ty_t} \sqrt{r_{xx} r_{yy}} \\
   \text{observed correlation between }x \text{ and } y &= \text{(true association between construct } A \text{ and construct } B) \times \\ & \;\;\; \sqrt{\text{reliability of } x \times \text{reliability of } y}
@@ -1207,27 +1122,13 @@ $$
 where $x = \text{measure of construct} \ A$; $y = \text{measure of construct} \ B$\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
 
 Below is an example of how to find the observed correlation between the predictor and criterion if the true association between the constructs (i.e., correlation between true scores of constructs) is .70, the [reliability](#reliability) of the predictor is .90, and the [reliability](#reliability) of the criterion is .85:\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
-
-```{r}
-trueAssociation <- .7
-reliabilityOfPredictor <- 0.9
-reliabilityOfCriterion <- 0.85
-
-trueAssociation * sqrt(reliabilityOfPredictor * reliabilityOfCriterion)
-```
-
-The [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] contains the `attenuationCorrelation()` function that estimates the observed association given the true association and the reliability of the predictor and criterion:\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{petersenlab package}
+The `petersenlab` package [@R-petersenlab] contains the `attenuationCorrelation()` function that estimates the observed association given the true association and the reliability of the predictor and criterion:\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{petersenlab package}
 
 ```{r}
 attenuationCorrelation(
   trueAssociation = 0.7, 
   reliabilityOfPredictor = 0.9,
   reliabilityOfCriterion = 0.85)
-```
-
-```{r, include = FALSE}
-observedAssociation <- trueAssociation * 
-  sqrt(reliabilityOfPredictor * reliabilityOfCriterion)
 ```
 
 The observed association ($r = `r apa(observedAssociation, 2, leading = FALSE)`$) is attenuated relative to the true association ($r = .70$).\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
@@ -1238,7 +1139,7 @@ The disattenuation formula is presented in Equation \@ref(eq:disattenuationFormu
 I extend it to a specific example in Equation \@ref(eq:disattenuationFormulaExample):\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
 
 $$
-\small
+\tiny
 \begin{aligned}
   r_{x_ty_t} &= \frac{r_{xy}}{\sqrt{r_{xx} r_{yy}}} \\
   \text{true association between construct } A \text{ and construct } B &= \frac{\text{observed correlation between } x \text{ and } y}{\sqrt{\text{reliability of } x \times \text{reliability of } y}}
@@ -1249,13 +1150,7 @@ $$
 where $x = \text{measure of construct} \ A$; $y = \text{measure of construct} \ B$\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
 
 Find the true association between the construct assessed by the predictor and the construct assessed by the criterion given an observed association if the [reliability](#reliability) of the predictor is .9, and the [reliability](#reliability) of the criterion is .85:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
-
-```{r}
-reliabilityOfPredictor <- 0.9
-reliabilityOfCriterion <- 0.85
-```
-
-The observed (attenuated) association is as follows:\index{measurement error!attenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
+The `petersenlab` package [@R-petersenlab] contains the `disattenuationCorrelation()` function that estimates the observed association given the true association and the reliability of the predictor and criterion:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{petersenlab package}
 
 ```{r}
 observedAssociation <- cor.test(
@@ -1263,30 +1158,24 @@ observedAssociation <- cor.test(
   y = mydataValidity$criterion)$estimate
 
 observedAssociation
-```
 
-The true (disattenuated) association is as follows:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}
+reliabilityOfPredictor <- 0.9
+reliabilityOfCriterion <- 0.85
 
-```{r}
-observedAssociation / sqrt(reliabilityOfPredictor * reliabilityOfCriterion)
-```
-
-The [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] contains the `disattenuationCorrelation()` function that estimates the observed association given the true association and the reliability of the predictor and criterion:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{petersenlab package}
-
-```{r}
 disattenuationCorrelation(
   observedAssociation = observedAssociation, 
-  reliabilityOfPredictor = 0.9,
-  reliabilityOfCriterion = 0.85)
+  reliabilityOfPredictor = reliabilityOfPredictor,
+  reliabilityOfCriterion = reliabilityOfCriterion)
 ```
 
 The disattenuation of an observed correlation due to [measurement error](#measurementError) can be demonstrated using [structural equation modeling](#sem).\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 For instance, consider the following observed association:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 
 ```{r}
-cor.test(
+cor(
   x = mydataValidity$predictorObservedSEM,
-  y = mydataValidity$criterionObservedSEM)$estimate
+  y = mydataValidity$criterionObservedSEM,
+  use = "pairwise.complete.obs")
 ```
 
 The observed association can be estimated in [structural equation modeling](#sem) in the `lavaan` package [@R-lavaan] using the following syntax:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
@@ -1304,11 +1193,19 @@ observedSEM_fit <- sem(
   observedSEM_syntax,
   data = mydataValidity,
   missing = "ML")
+```
 
-summary(
+Parameter estimates from the model are in Table \@ref(tab:observedAssociationSEM).\index{observed association}\index{structural equation modeling}
+
+```{r observedAssociationSEM, echo = FALSE}
+parameterEstimates(
   observedSEM_fit,
-  standardized = TRUE,
-  rsquare = TRUE)
+  standardized = TRUE) %>% 
+  kable(.,
+  caption = "Parameter Estimates of Observed Association in Structural Equation Model.",
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = "scale_down")
 ```
 
 ```{r, include = FALSE}
@@ -1322,22 +1219,12 @@ observedBeta <- observedSEM_parameters[
   "std.all"]
 ```
 
-A path diagram of the observed association is depicted in Figure \@ref(fig:observedSEM).\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
-
-```{r observedSEM, out.width = "100%", fig.align = "center", fig.cap = "Observed Association, as Depicted in a Structural Equation Model."}
-semPaths(observedSEM_fit,
-         what = "Std.all",
-         layout = "tree2",
-         edge.label.cex = 2)
-```
-
 Now consider when we account for the degree of [unreliability](#measurementError) of each measure.\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 We can account for the [(un)reliability](#reliability) of each measure by specifying the residual errors.\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 As described in Section \@ref(exampleFactorModelsFromCorrelationMatrices) of the chapter on [factor analysis](#factor-analysis-PCA), residual errors for each indicator are equal to $1 - R^2$.\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 Thus, we can account for the [(un)reliability](#reliability) of each measure by specifying the residual errors as $1 - \text{reliability}^2$, as below:\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 
 ```{r}
-# Syntax that specifies the reliability programmatically
 disattenuationSEM_syntax <- 
   paste(
     '
@@ -1349,34 +1236,31 @@ disattenuationSEM_syntax <-
     criterionLatent ~ predictorLatent
     
     # Specify residual errors (measurement error)
-    predictorObservedSEM ~~ (1 - ', reliabilityOfPredictor, '^2)*predictorObservedSEM
-    criterionObservedSEM ~~ (1 - ', reliabilityOfCriterion, '^2)*criterionObservedSEM
+    predictorObservedSEM ~~ (1 - ',
+      reliabilityOfPredictor, '^2)*predictorObservedSEM
+    criterionObservedSEM ~~ (1 - ',
+      reliabilityOfCriterion, '^2)*criterionObservedSEM
     ',
     sep = "")
-
-# Syntax that substitutes in the reliability values
-disattenuationTraditionalSEM_syntax <- '
-  # Factor loadings
-  predictorLatent =~ 1*predictorObservedSEM
-  criterionLatent =~ 1*criterionObservedSEM
-  
-  # Factor correlation
-  criterionLatent ~ predictorLatent
-  
-  # Specify residual errors (measurement error)
-  predictorObservedSEM ~~ (1 - .9^2)*predictorObservedSEM # where .9 is the reliability of the predictor
-  criterionObservedSEM ~~ (1 - .85^2)*criterionObservedSEM # where .85 is the reliability of the criterion
-'
 
 disattenuationSEM_fit <- sem(
   disattenuationSEM_syntax,
   data = mydataValidity,
   missing = "ML")
+```
 
-summary(
+Parameter estimates from the model are in Table \@ref(tab:trueAssociationSEM).\index{measurement error!disattenuation of association}\index{true association}\index{observed association}\index{structural equation modeling}
+
+```{r trueAssociationSEM, echo = FALSE}
+parameterEstimates(
   disattenuationSEM_fit,
-  standardized = TRUE,
-  rsquare = TRUE)
+  standardized = TRUE) %>% 
+  kable(.,
+  caption = "Parameter Estimates of Disattenuated Association in Structural Equation Model.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "") %>%
+  kable_styling(latex_options = "scale_down")
 ```
 
 ```{r, include = FALSE}
@@ -1390,19 +1274,9 @@ trueBeta <- disattenuationSEM_parameters[
   "std.all"]
 ```
 
-A path diagram of the true association is depicted in Figure \@ref(fig:disattenuationSEM).\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
-
-```{r disattenuationSEM, out.width = "100%", fig.align = "center", fig.cap = "Disattenuation of an Observed Association Due to Measurement Error, as Depicted in a Structural Equation Model."}
-semPaths(
-  disattenuationSEM_fit,
-  what = "Std.all",
-  layout = "tree2",
-  edge.label.cex = 2)
-```
-
 The observed association ($\beta = `r apa(observedBeta, 2)`$) becomes $\beta = `r apa(trueBeta, 2)`$ when it is disattenuated for [measurement error](#measurementError).\index{measurement error!disattenuation of association}\index{measurement error!random error}\index{true association}\index{observed association}\index{reliability}\index{validity!coefficient of}\index{structural equation modeling}
 
-## Generalizability Theory (G-Theory) {#gTheoryValidity}
+## Generalizability Theory {#gTheoryValidity}
 
 [Generalizability theory](#gTheory) (G-theory) is discussed in greater detail in the chapter on [reliability](#reliability) in Section \@ref(gTheoryReliability) and in the chapter on [generalizability theory](#gTheory).
 As a brief reminder, [G-theory](#gTheory) is a measurement theory that, unlike [classical test theory](#ctt), does not treat all measurement differences across time, rater, or situation as "error" but rather as a phenomenon of interest.\index{generalizability theory}\index{validity}\index{classical test theory}
@@ -1446,199 +1320,3 @@ Thus, when reporting validity in papers, it is important to adequately describe 
 ## Suggested Readings {#readings-validity}
 
 @Cronbach1955; @Clark2019
-
-## Exercises {#exercises-validity}
-
-```{r, include = FALSE}
-library("MOTE")
-```
-
-```{r, include = FALSE}
-cnlsy <- read_csv(here("Data", "cnlsy.csv"))
-```
-
-```{r, include = FALSE}
-# Criterion-Related Validity ----------------------------------------------
-
-cor.test(x = cnlsy$bpi_antisocialT1Sum, y = cnlsy$bpi_hyperactiveSum)
-criterionValidity_ex <- as.numeric(cor.test(x = cnlsy$bpi_antisocialT1Sum, y = cnlsy$bpi_hyperactiveSum)$estimate)
-```
-
-```{r, include = FALSE}
-# Attenuation of True Correlation due to Measurement Error ----------------
-
-#observed correlation between x and y = (true association between construct A and construct B) * sqrt(reliability of x and y), where x = measure of construct A; y = measure of construct B
-trueAssociation_ex <- .8 #assume the true association between the constructs (i.e., correlation between true scores of constructs) is .8
-reliabilityOfPredictor_ex <- 0.7 #assume the reliability of the predictor is .8
-reliabilityOfCriterion_ex <- 0.7090234 #assume the reliability of the predictor is .7
-
-observedAssociation_ex <- trueAssociation_ex * sqrt(reliabilityOfPredictor_ex * reliabilityOfCriterion_ex)
-```
-
-```{r, include = FALSE}
-# Disattenuation of Observed Correlation due to Measurement Error ---------
-
-#true association between construct A and construct B = (observed correlation between x and y)/sqrt(reliability of x and y), where x = measure of construct A; y = measure of construct B
-reliabilityOfPredictor_ex <- 0.7 #assume the reliability of the predictor is .8
-reliabilityOfCriterion_ex <- 0.8 #assume the reliability of the predictor is .7
-
-trueAssociation_ex <- as.numeric(cor.test(x = cnlsy$bpi_antisocialT1Sum, y = cnlsy$bpi_hyperactiveSum)$estimate)/sqrt(reliabilityOfPredictor_ex * reliabilityOfCriterion_ex)
-```
-
-```{r, include = FALSE}
-# Incremental Validity ----------------------------------------------------
-
-model1_ex <- lm(bpi_hyperactiveSum ~ bpi_antisocialT1Sum, data = na.omit(cnlsy))
-model2_ex <- lm(bpi_hyperactiveSum ~ bpi_antisocialT1Sum + bpi_anxiousDepressedSum, data = na.omit(cnlsy))
-
-model1F_ex <- model1_ex$fstatistic
-
-incrementalValidity_ex <- anova(model1_ex, model2_ex) #anxiety/depression shows incremental validity above antisocial behavior for predicting hyperactivity
-
-incrementalValidityF_ex <- incrementalValidity_ex$F[2]
-incrementalValiditydf_ex <- incrementalValidity_ex$Df[2]
-
-getDeltaRsquare(model2_ex) #anxiety/depression explains 6% additional variance in hyperactivity above variance explained by antisocial behavior
-deltaRsquare_ex <- getDeltaRsquare(model2_ex)[[2]]
-```
-
-```{r, include = FALSE}
-# Multitrait-multimethod matrix -----------------------------------------
-
-round(cor(MTMM_data), 2)
-
-round(cor(MTMM_data[,c("VO1","SO1","QO1",
-                       "VW1","SW1","QW1",
-                       "VM1","SM1","QM1")]), 2)
-```
-
-```{r, include = FALSE}
-# Multitrait-multimethod CFA --------------------------------------------
-
-#Example from W. Joel Schneider: https://my.ilstu.edu/~wjschne/442/CFA.html#(15)
-modelMTMM <- '
-  g =~ Verbal + Spatial + Quant
-  Verbal =~ 
-    VO1 + VO2 + VO3 + 
-    VW1 + VW2 + VW3 + 
-    VM1 + VM2 + VM3
-  Spatial =~ 
-    SO1 + SO2 + SO3 + 
-    SW1 + SW2 + SW3 + 
-    SM1 + SM2 + SM3
-  Quant =~ 
-    QO1 + QO2 + QO3 + 
-    QW1 + QW2 + QW3 + 
-    QM1 + QM2 + QM3
-  Oral =~ 
-    VO1 + VO2 + VO3 + 
-    SO1 + SO2 + SO3 + 
-    QO1 + QO2 + QO3
-  Written =~ 
-    VW1 + VW2 + VW3 + 
-    SW1 + SW2 + SW3 + 
-    QW1 + QW2 + QW3
-  Manipulative =~ 
-    VM1 + VM2 + VM3 + 
-    SM1 + SM2 + SM3 + 
-    QM1 + QM2 + QM3
-'
-```
-
-```{r, include = FALSE}
-MTMM.fit <- cfa(modelMTMM,
-                data = MTMM_data,
-                orthogonal = TRUE)
-```
-
-```{r, include = FALSE}
-summary(MTMM.fit,
-        fit.measures = TRUE,
-        standardized = TRUE,
-        rsquare = TRUE)
-```
-
-```{r, include = FALSE}
-#Path Diagram
-semPaths(MTMM.fit,
-         what = "Std.all",
-         layout = "tree3",
-         bifactor = c("Verbal","Spatial","Quant","g"))
-```
-
-```{r, include = FALSE}
-# Discriminant Validity ---------------------------------------------------
-
-modelCFA <- '
-  Verbal =~ 
-    VO1 + 
-    VW1 + 
-    VM1
-  Spatial =~ 
-    SO1 + 
-    SW1 + 
-    SM1
-  Quant =~ 
-    QO1 + 
-    QW1 + 
-    QM1
-'
-```
-
-
-```{r, include = FALSE}
-htmt_ex <- htmt(modelCFA,
-     data = MTMM_data,
-     missing = "ml")
-
-htmtVerbSpatial_ex <- htmt_ex[row.names(htmt_ex) == "Spatial", "Verbal"]
-```
-
-### Questions {#exercisesQuestions-validity}
-
-Note: Several of the following questions use data from the Children of the National Longitudinal Survey of Youth (CNLSY).
-The CNLSY is a publicly available longitudinal data set provided by the Bureau of Labor Statistics (https://www.bls.gov/nls/nlsy79-children.htm#topical-guide; archived at https://perma.cc/EH38-HDRN).
-The CNLSY data file for these exercises is located on this book's page of the Open Science Framework (https://osf.io/3pwza).
-Children's behavior problems were rated in 1988 (time 1: T1) and then again in 1990 (time 2: T2) on the Behavior Problems Index (BPI).
-
-1. What is the criterion-related validity of the Antisocial Behavior subscale of the BPI in relation to the Hyperactive subscale of the BPI?
-2. Assume the true correlation between two constructs, antisocial behavior and hyperactivity, is $r = .8$.
-And assume the reliability of the measure of antisocial behavior is $r = .7$, and the reliability of the measure of hyperactivity is $r = .7090234$.
-According to the attenuation formula (that attenuates the association due to measurement error), what would be the correlation between measures of antisocial behavior and hyperactivity that we would actually observe?
-3. Assume the true correlation between two constructs, antisocial behavior and hyperactivity, is $r = .8$, the reliability of the Antisocial Behavior subscale of the BPI is $r = .7$, and the reliability of the measure of Hyperactive subscale of the BPI is $r = .8$.
-According to the disattenuation formula (to correct for attenuation of the association due to measurement error), what would be the true association between the constructs of antisocial behavior and hyperactivity?
-4. You are interested in whether a child's levels of anxiety/depression can explain unique variance in children's hyperactivity above and beyond their level of antisocial behavior.
-Is the child's level of anxiety/depression (as rated on the Anxiety/Depression subscale of the BPI) significantly associated with the child's level of hyperactivity (as rated on the Hyperactive subscale of the BPI) above and beyond the variance accounted for by the child's level of antisocial behavior (as rated on the Antisocial Behavior subscale of the BPI).
-How much unique variance in hyperactivity is accounted for by their anxiety/depression?
-5. In Section \@ref(mtmmCorrelationMatrix), we simulated data for a multitrait-multimethod matrix. The simulated data includes data on participants' verbal, spatial, and quantitative abilities, each assessed in three subtests in each of three methods: oral, written, and manipulative.
-    a. Provide a multitrait-multimethod matrix of the data from the first subtest of each trait-by-method combination (`VO1`, `SO1`, `QO1`, `VW1`, `SW1`, `QW1`, `VM1`, `SM1`, `QM1`).
-Assume the reliability of the variables assessed orally is .7, the reliability of the variables assessed using the written method is .8, and the reliability of variables assessed using the manipulative method is .9.
-    b. Interpret the multitrait-multimethod matrix you just created.
-    c. What is the Heterotrait-Monotrait (HTMT) ratio for the measures of the verbal (`VO1`, `VW1`, `VM1`) and spatial (`SO1`, `SW1`, `SM1`) constructs?
-What does this indicate?
-
-### Answers {#exercisesAnswers-validity}
-
-1. The criterion-related validity is $r = `r apa(criterionValidity_ex, decimals = 2, leading = FALSE)`$.
-2. The observed correlation would be $r = `r apa(observedAssociation_ex, decimals = 2, leading = FALSE)`$.
-3. The true association would be $r = `r apa(trueAssociation_ex, decimals = 2, leading = FALSE)`$.
-4. Yes, the child's level of anxiety/depression is significantly associated with their hyperactivity above and beyond their antisocial behavior $(F[df = `r (incrementalValiditydf_ex)`] = `r apa(incrementalValidityF_ex, decimals = 2)`, p < .001)$.
-The child's level of anxiety/depression accounted for $`r apa(deltaRsquare_ex * 100, decimals = 2)`%$ unique variance in hyperactivity above and beyond their antisocial behavior.
-5.	
-    a. The multitrait-multimethod matrix is below:
-    
-```{r mtmmMatrix, out.width = "100%", fig.align = "center", fig.cap = "Multitrait-Multimethod Matrix.", echo = FALSE}
-knitr::include_graphics("./Images/MTMM.png")
-```
-
-5.
-    b. The convergent correlations (green cells) are statistically significant ($p\text{s} < .05$) and moderate in magnitude ($.45 < r\text{s} < .53$), supporting the convergent validity of the measures.
-[The reliabilities of these measures are not provided, so we are not able to compare the magnitude of the convergent validities to the magnitude of reliability to see the extent to which the convergent validities may be attenuated due to measurement unreliability].
-Evidence of discriminant validity is supported by three findings: First, the convergent correlations (green cells: $r\text{s} =$ .46–.53) are stronger than the heteromethod-heterotrait correlations (pink cells: $r\text{s} =$ .24–.34).
-Second, the convergent correlations (green cells: $r\text{s} =$ .46–.53) are stronger than the discriminant correlations (orange cells: $r\text{s} =$ .30–.43).
-Third, the patterns of intercorrelations between traits are the same, regardless of which measurement method is used.
-Verbal, spatial, and quantitative skills are intercorrelated for every measurement method used.
-    c. The HTMT ratio for the measures of the verbal and spatial constructs is $`r apa(htmtVerbSpatial_ex, decimals = 3, leading = TRUE)`$.
-The HTMT ratio is the average of the heterotrait-heteromethod correlations, relative to the average of the monotrait-heteromethod correlations.
-Given that the HTMT ratio is considerably less than 1 (and less than the common cutoff of .85), it indicates that the monotrait-heteromethod correlations are considerably larger than the heterotrait-heteromethod correlations.
-Thus, the HTMT provides evidence that the measures of verbal and spatial constructs show discriminant validity.

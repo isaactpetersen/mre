@@ -1,6 +1,6 @@
 # Test Bias {#bias}
 
-## Overview of Bias {#overview-bias}
+## Overview {#overview-bias}
 
 There are multiple definitions of the term "bias" depending on the context.
 In general, bias is a [systematic error](#systematicError) [@Reynolds2012].\index{bias}\index{bias!types of}
@@ -248,7 +248,7 @@ It also examines whether the manifestation of the construct differs between grou
 Even if you find the same slope and intercepts across groups in a prediction model, the measure would still be assessing different constructs across groups if the measure has a different factor structure between the groups.\index{bias!test structure}\index{structural equation modeling!measurement invariance}
 A different factor structure across groups is depicted in Figure \@ref(fig:testBias4).\index{bias!test structure}\index{structural equation modeling!measurement invariance}
 
-```{r testBias4, out.width = "100%", fig.align = "center", fig.cap = "Different Factor Structure Across Groups.", echo = FALSE}
+```{r testBias4, out.width = "80%", fig.align = "center", fig.cap = "Different Factor Structure Across Groups.", echo = FALSE}
 knitr::include_graphics("./Images/testBias-04.png")
 ```
 
@@ -400,7 +400,7 @@ A cutoff that represents equal odds is depicted where the [ROC curve](#roc) for 
 The equal odds approach to fairness is consistent with a National Academy of Sciences committee on fairness [@GeneralAptitudeTestBattery1989; @Gottfredson1994].\index{fairness!operationalizing}
 Approaches to operationalizing fairness in the context of prediction models are described by @Paulus2020.\index{fairness!operationalizing}
 
-(ref:testBias-ROCCaption) Receiver Operating Characteristic (ROC) Curves for Two Groups. Figure reprinted from @Fletcher2021, Figure 2, p. 3. Fletcher, R. R., Nakeshimana, A., & Olubeko, O. (2021). Addressing fairness, bias, and appropriate use of artificial intelligence and machine learning in global health. *Frontiers in Artificial Intelligence*, *3*(116). [https://doi.org/10.3389/frai.2020.561802](https://doi.org/10.3389/frai.2020.561802)
+(ref:testBias-ROCCaption) Receiver Operating Characteristic (ROC) Curves for Two Groups. Figure reprinted from @Fletcher2021, Figure 2, p. 3. Fletcher, R. R., Nakeshimana, A., \& Olubeko, O. (2021). Addressing fairness, bias, and appropriate use of artificial intelligence and machine learning in global health. *Frontiers in Artificial Intelligence*, *3*(116). [https://doi.org/10.3389/frai.2020.561802](https://doi.org/10.3389/frai.2020.561802)
 
 ```{r testBias-ROC, out.width = "100%", fig.align = "center", fig.cap = "(ref:testBias-ROCCaption)", echo = FALSE}
 knitr::include_graphics("./Images/testBias-ROC.png")
@@ -767,17 +767,21 @@ However, the improvements tend to apply across groups, and they do not seem to l
 ### Load Libraries {#loadLibraries-bias}
 
 ```{r}
-library("petersenlab") #to install: install.packages("remotes"); remotes::install_github("DevPsyLab/petersenlab")
+library("petersenlab")
 library("lavaan")
 library("semTools")
 library("semPlot")
 library("mirt")
-library("dmacs") #to install: install.packages("remotes"); remotes::install_github("ddueber/dmacs")
+library("dmacs")
 library("strucchange")
 library("MOTE")
-library("tidyverse")
 library("here")
+library("tidyverse")
 library("tinytex")
+library("knitr")
+library("kableExtra")
+library("rmarkdown")
+library("bookdown")
 ```
 
 ### Prepare Data {#prepareData-bias}
@@ -794,9 +798,7 @@ cnlsy <- read_csv(here("Data", "cnlsy.csv"))
 
 #### Simulate Data {#simulateData-bias}
 
-For reproducibility, I set the seed below.\index{simulate data}
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
+\index{simulate data}
 
 ```{r}
 sampleSize <- 4000
@@ -824,7 +826,8 @@ mydataBias$unbiasedPredictor1 <- rnorm(sampleSize, mean = 100, sd = 15)
 mydataBias$unbiasedPredictor2[which(mydataBias$group == "male")] <- 
   rnorm(length(which(mydataBias$group == "male")), mean = 70, sd = 15)
 mydataBias$unbiasedPredictor2[which(mydataBias$group == "female")] <- 
-  rnorm(length(which(mydataBias$group == "female")), mean = 130, sd = 15)
+  rnorm(length(which(mydataBias$group == "female")),
+        mean = 130, sd = 15)
 mydataBias$unbiasedPredictor3[which(mydataBias$group == "male")] <- 
   rnorm(length(which(mydataBias$group == "male")), mean = 130, sd = 15)
 mydataBias$unbiasedPredictor3[which(mydataBias$group == "female")] <- 
@@ -913,11 +916,12 @@ The test is unbiased because there are no significant differences in the regress
  
 ```{r}
 summary(lm(
-  unbiasedCriterion1 ~ unbiasedPredictor1 + group + unbiasedPredictor1:group,
+  unbiasedCriterion1 ~ unbiasedPredictor1 + group + 
+    unbiasedPredictor1:group,
   data = mydataBias))
 ```
 
-```{r unbiasedEqualMeans, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Unbiased Test Where Males and Females Have Equal Means on Predictor and Criterion."}
+```{r unbiasedEqualMeans, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Unbiased Test Where Males and Females Have Equal Means on Predictor and Criterion."}
 plot(
   unbiasedCriterion1 ~ unbiasedPredictor1,
   data = mydataBias,
@@ -940,27 +944,27 @@ points(
   mydataBias$unbiasedPredictor1[which(mydataBias$group == "male")],
   mydataBias$unbiasedCriterion1[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(mydataBias$unbiasedPredictor1[which(mydataBias$group == "female")],
        mydataBias$unbiasedCriterion1[which(mydataBias$group == "female")],
        pch = 1,
-       col = "red")
+       col = "black")
 abline(lm(
   unbiasedCriterion1 ~ unbiasedPredictor1,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   unbiasedCriterion1 ~ unbiasedPredictor1,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ### Unbiased test where females have higher means than males on predictor and criterion {#unbiasedTestsFemalesHigherMeans}
@@ -970,11 +974,12 @@ The test is unbiased because there are no differences in the regression lines (o
 
 ```{r}
 summary(lm(
-  unbiasedCriterion2 ~ unbiasedPredictor2 + group + unbiasedPredictor2:group,
+  unbiasedCriterion2 ~ unbiasedPredictor2 + group + 
+    unbiasedPredictor2:group,
   data = mydataBias))
 ```
 
-```{r unbiasedFemaleHigher, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Unbiased Test Where Females Have Higher Means Than Males on Predictor and Criterion."}
+```{r unbiasedFemaleHigher, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Unbiased Test Where Females Have Higher Means Than Males on Predictor and Criterion."}
 plot(
   unbiasedCriterion2 ~ unbiasedPredictor2,
   data = mydataBias,
@@ -997,28 +1002,28 @@ points(
   mydataBias$unbiasedPredictor2[which(mydataBias$group == "male")],
   mydataBias$unbiasedCriterion2[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(
   mydataBias$unbiasedPredictor2[which(mydataBias$group == "female")],
   mydataBias$unbiasedCriterion2[which(mydataBias$group == "female")],
   pch = 1,
-  col = "red")
+  col = "black")
 abline(lm(
   unbiasedCriterion2 ~ unbiasedPredictor2,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   unbiasedCriterion2 ~ unbiasedPredictor2,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ### Unbiased test where males have higher means than females on predictor and criterion {#unbiasedTestsMalesHigherMeans}
@@ -1028,11 +1033,12 @@ The test is unbiased because there are no differences in the regression lines (o
 
 ```{r}
 summary(lm(
-  unbiasedCriterion3 ~ unbiasedPredictor3 + group + unbiasedPredictor3:group,
+  unbiasedCriterion3 ~ unbiasedPredictor3 + group + 
+    unbiasedPredictor3:group,
   data = mydataBias))
 ```
 
-```{r unbiasedMaleHigher, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Unbiased Test Where Males Have Higher Means Than Females on Predictor and Criterion."}
+```{r unbiasedMaleHigher, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Unbiased Test Where Males Have Higher Means Than Females on Predictor and Criterion."}
 plot(
   unbiasedCriterion3 ~ unbiasedPredictor3,
   data = mydataBias,
@@ -1053,28 +1059,28 @@ points(
   mydataBias$unbiasedPredictor3[which(mydataBias$group == "male")],
   mydataBias$unbiasedCriterion3[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(
   mydataBias$unbiasedPredictor3[which(mydataBias$group == "female")],
   mydataBias$unbiasedCriterion3[which(mydataBias$group == "female")],
   pch = 1,
-  col = "red")
+  col = "black")
 abline(lm(
   unbiasedCriterion3 ~ unbiasedPredictor3,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   unbiasedCriterion3 ~ unbiasedPredictor3,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ## Predictive Bias: Different Regression Lines {#predictiveBiasExamples}
@@ -1090,7 +1096,7 @@ summary(lm(
   data = mydataBias))
 ```
 
-```{r unbiased2, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Example of Unbiased Prediction (No Differences in Intercepts or Slopes Between Males and Females)."}
+```{r unbiased2, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Example of Unbiased Prediction (No Differences in Intercepts or Slopes Between Males and Females)."}
 plot(
   criterion1 ~ predictor,
   data = mydataBias,
@@ -1113,28 +1119,28 @@ points(
   mydataBias$predictor[which(mydataBias$group == "male")],
   mydataBias$criterion1[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(
   mydataBias$predictor[which(mydataBias$group == "female")],
   mydataBias$criterion1[which(mydataBias$group == "female")],
   pch = 1,
-  col = "red")
+  col = "black")
 abline(lm(
   criterion1 ~ predictor,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   criterion1 ~ predictor,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ### Example of intercept bias {#interceptBias}
@@ -1149,7 +1155,7 @@ summary(lm(
   data = mydataBias))
 ```
 
-```{r interceptBias, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Example of Intercept Bias in Prediction (Different Intercepts Between Males and Females)."}
+```{r interceptBias, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Example of Intercept Bias in Prediction (Different Intercepts Between Males and Females)."}
 plot(
   criterion2 ~ predictor,
   data = mydataBias,
@@ -1171,28 +1177,28 @@ points(
   mydataBias$predictor[which(mydataBias$group == "male")],
   mydataBias$criterion2[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(
   mydataBias$predictor[which(mydataBias$group == "female")],
   mydataBias$criterion2[which(mydataBias$group == "female")],
   pch = 1,
-  col = "red")
+  col = "black")
 abline(lm(
   criterion2 ~ predictor,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   criterion2 ~ predictor,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ### Example of slope bias {#slopeBias}
@@ -1207,7 +1213,7 @@ summary(lm(
   data = mydataBias))
 ```
 
-```{r slopeBias, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Example of Slope Bias in Prediction (Different Slopes Between Males And Females)."}
+```{r slopeBias, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Example of Slope Bias in Prediction (Different Slopes Between Males And Females)."}
 plot(
   criterion3 ~ predictor,
   data = mydataBias,
@@ -1230,28 +1236,28 @@ points(
   mydataBias$predictor[which(mydataBias$group == "male")],
   mydataBias$criterion3[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(
   mydataBias$predictor[which(mydataBias$group == "female")],
   mydataBias$criterion3[which(mydataBias$group == "female")],
   pch = 1,
-  col = "red")
+  col = "black")
 abline(lm(
   criterion3 ~ predictor,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   criterion3 ~ predictor,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ### Example of intercept and slope bias {#interceptSlopeBias}
@@ -1268,7 +1274,7 @@ summary(lm(
   data = mydataBias))
 ```
 
-```{r interceptSlopeBias, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Example of Intercept And Slope Bias in Prediction (Different Intercepts and Slopes Between Males and Females)."}
+```{r interceptSlopeBias, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Example of Intercept And Slope Bias in Prediction (Different Intercepts and Slopes Between Males and Females)."}
 plot(
   criterion4 ~ predictor,
   data = mydataBias,
@@ -1291,28 +1297,28 @@ points(
   mydataBias$predictor[which(mydataBias$group == "male")],
   mydataBias$criterion4[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(
   mydataBias$predictor[which(mydataBias$group == "female")],
   mydataBias$criterion4[which(mydataBias$group == "female")],
   pch = 1,
-  col = "red")
+  col = "black")
 abline(lm(
   criterion4 ~ predictor,
   data = mydataBias[which(mydataBias$group == "male"),]),
   lty = 1,
-  col = "blue")
+  col = "gray")
 abline(lm(
   criterion4 ~ predictor,
   data = mydataBias[which(mydataBias$group == "female"),]),
   lty = 2,
-  col = "red")
+  col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
 ### Example of different measurement reliability/error across groups {#differentialReliability}
@@ -1326,7 +1332,7 @@ summary(lm(
   data = mydataBias))
 ```
 
-```{r differentMeasurementError, out.width = "100%", fig.align = "center", class.source = "fold-hide", fig.cap = "Example of Different Measurement Reliability/Error Across Groups."}
+```{r differentMeasurementError, out.width = "100%", fig.align = "center", echo = FALSE, fig.cap = "Example of Different Measurement Reliability/Error Across Groups."}
 plot(
   criterion5 ~ predictor,
   data = mydataBias,
@@ -1348,28 +1354,28 @@ points(
   mydataBias$predictor[which(mydataBias$group == "male")],
   mydataBias$criterion5[which(mydataBias$group == "male")],
   pch = 20,
-  col = "blue")
+  col = "gray")
 points(mydataBias$predictor[which(mydataBias$group == "female")],
        mydataBias$criterion5[which(mydataBias$group == "female")],
        pch = 1,
-       col = "red")
+       col = "black")
 abline(lm(criterion5 ~ predictor,
           data = mydataBias[which(mydataBias$group == "male"),]),
        lty = 1,
-       col = "blue")
+       col = "gray")
 abline(lm(criterion5 ~ predictor,
           data = mydataBias[which(mydataBias$group == "female"),]),
        lty = 2,
-       col = "red")
+       col = "black")
 legend(
   "bottomright",
   c("Male","Female"),
   lty = c(1,2),
   pch = c(20,1),
-  col = c("blue","red"))
+  col = c("gray","black"))
 ```
 
-## Differential Item Functioning (DIF) {#dif}
+## Differential Item Functioning {#dif}
 
 Differential item functioning (DIF) indicates that one or more items functions differently across groups.\index{item response theory!differential item functioning}
 That is, one or more of the item parameters for an item differs across groups.\index{item response theory!differential item functioning}
@@ -1395,18 +1401,6 @@ Thus, it can also be beneficial to review and address DIF sequentially by magnit
 
 Tests of DIF were conducted using the `mirt` package [@R-mirt].\index{item response theory!differential item functioning}
 
-### Item Descriptive Statistics {#descriptiveStats-bias}
-
-```{r}
-itemstats(
-  data = cnlsy[,c(
-    "bpi_antisocialT1_1","bpi_antisocialT1_2","bpi_antisocialT1_3",
-    "bpi_antisocialT1_4","bpi_antisocialT1_5","bpi_antisocialT1_6",
-    "bpi_antisocialT1_7")],
-  group = cnlsy$sex,
-  ts.tables = TRUE)
-```
-
 ### Unconstrained Model {#difUnconstrained}
 
 #### Fit Model {#difUnconstrainedFit}
@@ -1430,7 +1424,6 @@ Items that appear to differ:\index{item response theory!differential item functi
 - item 4 has higher [difficulty/severity](#itemDifficulty) ($b_1$ and $b_2$ parameters) among males than females\index{item response theory!differential item functioning}\index{item response theory!item difficulty}
 
 ```{r}
-summary(unconstrainedModel)
 coef(unconstrainedModel,
      simplify = TRUE,
      IRTpars = TRUE)
@@ -1461,7 +1454,6 @@ constrainedModel <- multipleGroup(
 #### Model Summary {#difConstrainedSummary}
 
 ```{r}
-summary(constrainedModel)
 coef(
   constrainedModel,
   simplify = TRUE,
@@ -1490,42 +1482,84 @@ Items 1, 3, 4, 5, 6, and 7 showed [DIF](#dif) in [discrimination](#itemDiscrimin
 
 \index{item response theory!differential item functioning}\index{item response theory!item discrimination}\index{item response theory!item difficulty}
 
-```{r}
+```{r, eval = FALSE}
+DIF(
+  constrainedModel,
+  c("a1","d1","d2"),
+  scheme = "drop",
+  simplify = TRUE)
+```
+
+```{r, echo = FALSE}
 difDropItems <- DIF(
   constrainedModel,
   c("a1","d1","d2"),
   scheme = "drop",
   simplify = TRUE)
 
-difDropItems
+difDropItems %>% 
+  kable(.,
+  caption = "Differential Item Functioning in Terms of Discrimination And/Or Severity.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "") %>%
+  kable_styling(latex_options = "scale_down")
 ```
 
 #### Items that differ in discrimination {#difRemoveConstraintsDiscrimination}
 
 Items 1, 3, 4, and 5 showed [DIF](#dif) in [discrimination](#itemDiscrimination), based on a significant chi-square difference test.\index{item response theory!differential item functioning}\index{item response theory!item discrimination}\index{chi-square!difference test}
 
-```{r}
+```{r, eval = FALSE}
+DIF(
+  constrainedModel,
+  c("a1"),
+  scheme = "drop",
+  simplify = TRUE)
+```
+
+```{r, echo = FALSE}
 difDropItemsDiscrimination <- DIF(
   constrainedModel,
   c("a1"),
   scheme = "drop",
   simplify = TRUE)
 
-difDropItemsDiscrimination
+difDropItemsDiscrimination %>% 
+  kable(.,
+  caption = "Differential Item Functioning in Terms of Discrimination.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "") %>%
+  kable_styling(latex_options = "scale_down")
 ```
 
 #### Items that differ in severity {#difRemoveConstraintsSeverity}
 
 Items 1, 3, 4, 5, and 7 showed [DIF](#dif) in [difficulty/severity](#itemDifficulty), based on a significant chi-square difference test.\index{item response theory!differential item functioning}\index{item response theory!item difficulty}\index{chi-square!difference test}
 
-```{r}
+```{r, eval = FALSE}
+DIF(
+  constrainedModel,
+  c("d1","d2"),
+  scheme = "drop",
+  simplify = TRUE)
+```
+
+```{r, echo = FALSE}
 difDropItemsSeverity <- DIF(
   constrainedModel,
   c("d1","d2"),
   scheme = "drop",
   simplify = TRUE)
 
-difDropItemsSeverity
+difDropItemsSeverity %>% 
+  kable(.,
+  caption = "Differential Item Functioning in Terms of Severity.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "") %>%
+  kable_styling(latex_options = "scale_down")
 ```
 
 ### Identify DIF by iteratively adding constraints to unconstrained model {#difAddConstraints}
@@ -1535,49 +1569,14 @@ difDropItemsSeverity
 Another way to identify DIF is it interatively add constraints to a model in which all parameters are allowed to differ across groups.index{item response theory!differential item functioning}
 Adding constraints forces individual items to have the same item parameters across groups, to identify which items yield a significant worsening in model fit when constraining their [discrimination](#itemDiscrimination) and/or [severity](#itemDifficulty) to be the same across groups.\index{item response theory!differential item functioning}
 Items 1, 2, 3, 4, 5, and 6 showed [DIF](#dif) in [discrimination](#itemDiscrimination) and/or [severity](#itemDifficulty), based on a significant chi-square difference test.\index{item response theory!differential item functioning}\index{item response theory!item discrimination}\index{item response theory!item difficulty}\index{chi-square!difference test}
-The [DIF](#dif) in [discrimination](#itemDiscrimination) and/or [severity](#itemDifficulty) is depicted in Figure \@ref(fig:difAddDiscriminationSeverity).\index{item response theory!differential item functioning}\index{item response theory!item discrimination}\index{item response theory!item difficulty}
 
-```{r difAddDiscriminationSeverity, out.width = "100%", fig.align = "center", fig.cap = "Item Probability Functions for Examining Differential Item Functioning in Terms of Discrimination and/or Severity."}
+```{r, eval = FALSE}
 difAddItems <- DIF(
   unconstrainedModel,
   c("a1","d1","d2"),
   scheme = "add",
   simplify = TRUE,
   plotdif = TRUE)
-
-difAddItems
-```
-
-#### Items that differ in discrimination {#difAddConstraintsDiscrimination}
-
-Items 6 and 7 showed [DIF](#dif) in [discrimination](#itemDiscrimination), based on a significant chi-square difference test.\index{item response theory!differential item functioning}\index{item response theory!item discrimination}\index{chi-square!difference test}
-The [DIF](#dif) in [discrimination](#itemDiscrimination) is depicted in Figure \@ref(fig:difAddDiscrimination).\index{item response theory!differential item functioning}\index{item response theory!item discrimination}
-
-```{r difAddDiscrimination, out.width = "100%", fig.align = "center", fig.cap = "Item Probability Functions for Examining Differential Item Functioning in Terms of Discrimination."}
-difAddItemsDiscrimination <- DIF(
-  unconstrainedModel,
-  c("a1"),
-  scheme = "add",
-  simplify = TRUE,
-  plotdif = TRUE)
-
-difAddItemsDiscrimination
-```
-
-#### Items that differ in severity {#difAddConstraintsSeverity}
-
-Items 1, 2, 3, 4, 5, and 6 showed [DIF](#dif) in [difficulty/severity](#itemDifficulty), based on a significant chi-square difference test.\index{item response theory!differential item functioning}\index{item response theory!item difficulty}\index{chi-square!difference test}
-The [DIF](#dif) in [difficulty/severity](#itemDifficulty) is depicted in Figure \@ref(fig:difAddSeverity)\index{item response theory!differential item functioning}\index{item response theory!item difficulty}
-
-```{r difAddSeverity, out.width = "100%", fig.align = "center", fig.cap = "Item Probability Functions for Examining Differential Item Functioning in Terms of Severity."}
-difAddItemsSeverity <- DIF(
-  unconstrainedModel,
-  c("d1","d2"),
-  scheme = "add",
-  simplify = TRUE,
-  plotdif = TRUE)
-
-difAddItemsSeverity
 ```
 
 ### Compute effect size of DIF {#difEffectSize}
@@ -1590,75 +1589,102 @@ Some researchers recommend using a simulation-based procedure to examine the imp
 [Differential test functioning](#dif) is depicted in Figure \@ref(fig:dtf).\index{item response theory!differential item functioning}\index{effect size}
 Estimates of [differential test functioning](#dif) are in Table \@ref(tab:testLevelDIF).\index{item response theory!differential item functioning}
 
-```{r testLevelDIF}
+```{r, eval = FALSE}
 empirical_ES(
   unconstrainedModel,
   DIF = FALSE)
+```
+
+```{r testLevelDIF, echo = FALSE}
+testLevelDIF <- empirical_ES(
+  unconstrainedModel,
+  DIF = FALSE)
+
+testLevelDIF %>% 
+  kable(.,
+  caption = "Test-Level Differential Item Functioning.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "")
 ```
 
 In general, the measure showed greater [difficulty](#itemDifficulty) for females than for males.\index{item response theory!differential item functioning}\index{effect size}\index{item response theory!item difficulty}
 That is, at a given construct level, males were more likely than females to endorse the items.\index{item response theory!differential item functioning}\index{effect size}\index{item response theory!item difficulty}
 Otherwise said, it takes a higher construct level for females to obtain the same score on the measure as males.\index{item response theory!differential item functioning}\index{effect size}\index{item response theory!item difficulty}
 
-```{r dtf, out.width = "100%", fig.align = "center", fig.align = "center", fig.cap = "Differential Test Functioning by Sex."}
+```{r, eval = FALSE}
 empirical_ES(
   unconstrainedModel,
   DIF = FALSE,
   plot = TRUE)
 ```
 
+```{r dtf, out.width = "100%", fig.align = "center", fig.align = "center", fig.cap = "Differential Test Functioning by Sex.", echo = FALSE}
+empirical_ES(
+  unconstrainedModel,
+  DIF = FALSE,
+  plot = TRUE,
+  par.settings = standard.theme("pdf", color = FALSE))
+```
+
 #### Item-level DIF {#difItemLevel}
 
-[Differential item functioning](#dif) is depicted in Figure \@ref(fig:dif).\index{item response theory!differential item functioning}\index{effect size}
-Estimates of [differential item functioning](#dif) are in Table \@ref(tab:itemLevelDIF).\index{item response theory!differential item functioning}
-
-```{r itemLevelDIF}
+```{r, eval = FALSE}
 empirical_ES(
   unconstrainedModel,
   DIF = TRUE) %>% 
   round(., 2)
 ```
 
+```{r itemLevelDIF, echo = FALSE}
+itemLevelDIF <- empirical_ES(
+  unconstrainedModel,
+  DIF = TRUE) %>% 
+  round(., 2)
+
+itemLevelDIF %>% 
+  kable(.,
+  caption = "Item-Level Differential Item Functioning.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "") %>%
+  kable_styling(latex_options = "scale_down")
+```
+
+[Differential item functioning](#dif) is depicted in Figure \@ref(fig:dif).\index{item response theory!differential item functioning}\index{effect size}
+Estimates of [differential item functioning](#dif) are in Table \@ref(tab:itemLevelDIF).\index{item response theory!differential item functioning}
+
 The measure-level differences in functioning appear to be largely driven by greater [difficulty](#itemDifficulty) of items 4 and 5 for females than males.\index{item response theory!differential item functioning}\index{effect size}\index{item response theory!item difficulty}
 That is, at a given construct level, males were more likely than females to endorse items 4 and 5, in particular.\index{item response theory!differential item functioning}\index{effect size}\index{item response theory!item difficulty}
 Otherwise said, it takes a higher construct level for females than males to endorse items 4 and 5.\index{item response theory!differential item functioning}\index{effect size}\index{item response theory!item difficulty}
 
-```{r dif, out.width = "100%", fig.align = "center", fig.cap = "Differential Item Functioning by Sex."}
+```{r, eval = FALSE}
 empirical_ES(
   unconstrainedModel,
   DIF = TRUE,
   plot = TRUE)
 ```
 
+```{r dif, out.width = "100%", fig.align = "center", fig.cap = "Differential Item Functioning by Sex.", echo = FALSE}
+empirical_ES(
+  unconstrainedModel,
+  DIF = TRUE,
+  plot = TRUE,
+  par.settings = standard.theme("pdf", color = FALSE))
+```
+
 ### Item plots {#difItemPlots}
 
-Plots of item response category characteristic curves by sex are in Figures \@ref(fig:ircSex1)–\@ref(fig:ircSex7) below.\index{item response theory!differential item functioning}\index{item response theory!item response category characteristic curve}
+Item response category characteristic curves by sex for Item 4 are in Figure \@ref(fig:ircSex4).\index{item response theory!differential item functioning}\index{item response theory!item response category characteristic curve}
 
-```{r ircSex1, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 1."}
+```{r, eval = FALSE}
 itemplot(
   unconstrainedModel,
-  "bpi_antisocialT1_1",
-  type = "trace",
-  par.settings = standard.theme("pdf", color = FALSE))
+  "bpi_antisocialT1_4",
+  type = "trace")
 ```
 
-```{r ircSex2, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 2."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_2",
-  type = "trace",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r ircSex3, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 3."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_3",
-  type = "trace",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r ircSex4, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 4."}
+```{r ircSex4, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 4.", echo = FALSE}
 itemplot(
   unconstrainedModel,
   "bpi_antisocialT1_4",
@@ -1666,75 +1692,18 @@ itemplot(
   par.settings = standard.theme("pdf", color = FALSE))
 ```
 
-```{r ircSex5, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 5."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_5",
-  type = "trace",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r ircSex6, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 6."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_6",
-  type = "trace",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r ircSex7, out.width = "100%", fig.align = "center", fig.cap = "Item Response Category Characteristic Curves by Sex: Item 7."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_7",
-  type = "trace",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-Plots of item [information](#irtReliability) functions by sex are in Figures \@ref(fig:itemInfo1)–\@ref(fig:itemInfo7) below.\index{item response theory!differential item functioning}\index{item response theory!item information curve}
+Plots of item [information](#irtReliability) functions by sex for Item 6 are in Figure \@ref(fig:itemInfo6).\index{item response theory!differential item functioning}\index{item response theory!item information curve}
 Items 1, 5, and 6 showed greater [information](#irtReliability) for females than for males.\index{item response theory!differential item functioning}\index{item response theory!item information curve}
 Items 2, 4, and 7 showed greater [information](#irtReliability) for females than for males.\index{item response theory!differential item functioning}\index{item response theory!item information curve}
 
-```{r itemInfo1, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 1."}
+```{r, eval = FALSE}
 itemplot(
   unconstrainedModel,
-  "bpi_antisocialT1_1",
-  type = "info",
-  par.settings = standard.theme("pdf", color = FALSE))
+  "bpi_antisocialT1_6",
+  type = "info")
 ```
 
-```{r itemInfo2, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 2."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_2",
-  type = "info",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemInfo3, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 3."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_3",
-  type = "info",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemInfo4, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 4."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_4",
-  type = "info",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemInfo5, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 5."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_5",
-  type = "info",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemInfo6, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 6."}
+```{r itemInfo6, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 6.", echo = FALSE}
 itemplot(
   unconstrainedModel,
   "bpi_antisocialT1_6",
@@ -1742,41 +1711,16 @@ itemplot(
   par.settings = standard.theme("pdf", color = FALSE))
 ```
 
-```{r itemInfo7, out.width = "100%", fig.align = "center", fig.cap = "Item Information Curves by Sex: Item 7."}
+Plots of expected item scores by sex for Items 4 and 6 are in Figures \@ref(fig:itemScore4) and \@ref(fig:itemScore6), respectively.\index{item response theory!differential item functioning}
+
+```{r, eval = FALSE}
 itemplot(
   unconstrainedModel,
-  "bpi_antisocialT1_7",
-  type = "info",
-  par.settings = standard.theme("pdf", color = FALSE))
+  "bpi_antisocialT1_4",
+  type = "score")
 ```
 
-Plots of expected item scores by sex are are in Figures \@ref(fig:itemScore1)–\@ref(fig:itemScore7) below.\index{item response theory!differential item functioning}
-
-```{r itemScore1, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 1."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_1",
-  type = "score",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemScore2, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 2."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_2",
-  type = "score",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemScore3, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 3."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_3",
-  type = "score",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemScore4, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 4."}
+```{r itemScore4, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 4.", echo = FALSE}
 itemplot(
   unconstrainedModel,
   "bpi_antisocialT1_4",
@@ -1784,26 +1728,17 @@ itemplot(
   par.settings = standard.theme("pdf", color = FALSE))
 ```
 
-```{r itemScore5, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 5."}
-itemplot(
-  unconstrainedModel,
-  "bpi_antisocialT1_5",
-  type = "score",
-  par.settings = standard.theme("pdf", color = FALSE))
-```
-
-```{r itemScore6, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 6."}
+```{r, eval = FALSE}
 itemplot(
   unconstrainedModel,
   "bpi_antisocialT1_6",
-  type = "score",
-  par.settings = standard.theme("pdf", color = FALSE))
+  type = "score")
 ```
 
-```{r itemScore7, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 7."}
+```{r itemScore6, out.width = "100%", fig.align = "center", fig.cap = "Expected Item Score by Sex: Item 6.", echo = FALSE}
 itemplot(
   unconstrainedModel,
-  "bpi_antisocialT1_7",
+  "bpi_antisocialT1_6",
   type = "score",
   par.settings = standard.theme("pdf", color = FALSE))
 ```
@@ -1916,8 +1851,10 @@ difDropItemsNew <- DIF(
 difDropItemsNew %>% 
   kable(.,
   caption = "Differential Item Functioning After Resolving DIF in Item 5.",
+  format = "latex",
   booktabs = TRUE,
-  linesep = "")
+  linesep = "") %>%
+  kable_styling(latex_options = "scale_down")
 ```
 
 Of the remaining [DIF](#dif), item 4 appears to have the largest [DIF](#dif).\index{item response theory!differential item functioning}\index{bias!correcting for!resolve biased items}\index{bias!correcting for!remove biased items}
@@ -2024,244 +1961,13 @@ Thus, a significant chi-square equivalence test suggests that the equality const
 
 ### Specify Models {#measurementInvarianceModels}
 
-#### Null Model {#measurementInvarianceNullModelSyntax}
-
-Fix residual variances and intercepts of manifest variables to be equal across groups.\index{structural equation modeling!measurement invariance}
-
-```{r nullModel, cache = TRUE}
-nullModel <- '
-#Fix residual variances of manifest variables to be equal across groups
-x1 ~~ c(psi1, psi1)*x1
-x2 ~~ c(psi2, psi2)*x2
-x3 ~~ c(psi3, psi3)*x3
-x4 ~~ c(psi4, psi4)*x4
-x5 ~~ c(psi5, psi5)*x5
-x6 ~~ c(psi6, psi6)*x6
-x7 ~~ c(psi7, psi7)*x7
-x8 ~~ c(psi8, psi8)*x8
-x9 ~~ c(psi9, psi9)*x9
-
-#Fix intercepts of manifest variables to be equal across groups
-x1 ~ c(tau1, tau1)*1
-x2 ~ c(tau2, tau2)*1
-x3 ~ c(tau3, tau3)*1
-x4 ~ c(tau4, tau4)*1
-x5 ~ c(tau5, tau5)*1
-x6 ~ c(tau6, tau6)*1
-x7 ~ c(tau7, tau7)*1
-x8 ~ c(tau8, tau8)*1
-x9 ~ c(tau9, tau9)*1
-'
-```
-
 #### CFA Model {#measurementInvarianceCFAsyntax}
 
 ```{r cfaModelChunk, cache = TRUE}
 cfaModel <- '
- #Factor loadings
  visual  =~ x1 + x2 + x3
  textual =~ x4 + x5 + x6
  speed   =~ x7 + x8 + x9
-'
-```
-
-#### Configural Invariance {#measurementInvarianceConfiguralSyntax}
-
-Specify the same number of factors in each group, and which indicators load on which factors are the same in each group.\index{structural equation modeling!measurement invariance!configural}
-
-```{r configuralInvarianceModel, cache = TRUE}
-cfaModel_configuralInvariance <- '
- #Factor loadings (free the factor loading of the first indicator)
- visual  =~ NA*x1 + x2 + x3
- textual =~ NA*x4 + x5 + x6
- speed   =~ NA*x7 + x8 + x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one
- visual ~~ 1*visual
- textual ~~ 1*textual
- speed ~~ 1*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Free intercepts of manifest variables
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-```
-
-#### Metric ("Weak Factorial") Invariance {#measurementInvarianceMetricSyntax}
-
-Specify invariance of factor loadings across groups.\index{structural equation modeling!measurement invariance!metric}\index{structural equation modeling!factor loading}
-
-```{r metricInvarianceModel, cache = TRUE}
-cfaModel_metricInvariance <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Free intercepts of manifest variables
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-```
-
-#### Scalar ("Strong Factorial") Invariance {#measurementInvarianceScalarSyntax}
-
-Specify invariance of factor loadings and intercepts across groups.\index{structural equation modeling!measurement invariance!scalar}\index{structural equation modeling!factor loading}\index{structural equation modeling!intercept}
-
-```{r scalarInvarianceModel, cache = TRUE}
-cfaModel_scalarInvariance <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero in group 1; free latent means in group 2
- visual ~ c(0, NA)*1
- textual ~ c(0, NA)*1
- speed ~ c(0, NA)*1
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ c(intx2, intx2)*1
- x3 ~ c(intx3, intx3)*1
- x4 ~ c(intx4, intx4)*1
- x5 ~ c(intx5, intx5)*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-```
-
-#### Residual ("Strict Factorial") Invariance {#measurementInvarianceResidualSyntax}
-
-Specify invariance of factor loadings, intercepts, and residuals across groups.\index{structural equation modeling!measurement invariance!residual}\index{structural equation modeling!factor loading}\index{structural equation modeling!intercept}\index{structural equation modeling!residual}
-
-```{r residualInvarianceModel, cache = TRUE}
-cfaModel_residualInvariance <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ c(0, NA)*1
- textual ~ c(0, NA)*1
- speed ~ c(0, NA)*1
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Fix residual variances of manifest variables across groups
- x1 ~~ c(residx1, residx1)*x1
- x2 ~~ c(residx2, residx2)*x2
- x3 ~~ c(residx3, residx3)*x3
- x4 ~~ c(residx4, residx4)*x4
- x5 ~~ c(residx5, residx5)*x5
- x6 ~~ c(residx6, residx6)*x6
- x7 ~~ c(residx7, residx7)*x7
- x8 ~~ c(residx8, residx8)*x8
- x9 ~~ c(residx9, residx9)*x9
- 
- #Fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ c(intx2, intx2)*1
- x3 ~ c(intx3, intx3)*1
- x4 ~ c(intx4, intx4)*1
- x5 ~ c(intx5, intx5)*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
 '
 ```
 
@@ -2272,29 +1978,6 @@ myAFIs <- c("chisq", "chisq.scaled",
             "rmsea", "cfi", "tli", "srmr",
             "rmsea.robust", "cfi.robust", "tli.robust")
 moreAFIs <- NULL # c("gammaHat","gammaHat.scaled")
-```
-
-### Null Model {#measurementInvarianceNullModel}
-
-#### Fit the Model {#measurementInvarianceNullModelFit}
-
-```{r nullFit, cache = TRUE, cache.comments = FALSE}
-nullModelFit <- lavaan(
-  nullModel,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-```
-
-#### Model Summary {#measurementInvarianceNullModelSummary}
-
-```{r}
-summary(
-  nullModelFit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
 ```
 
 ### Configural Invariance {#measurementInvarianceConfigural}
@@ -2309,26 +1992,8 @@ configuralInvarianceModel <- measEq.syntax(
   data = HolzingerSwineford1939,
   ID.fac = "std.lv",
   group = "school")
-```
 
-```{r}
-cat(as.character(configuralInvarianceModel))
-```
-
-```{r configuralInvarianceModelSyntax2, cache = TRUE, cache.comments = FALSE, dependson = "configuralInvarianceModelSyntax1"}
 configuralInvarianceSyntax <- as.character(configuralInvarianceModel)
-```
-
-##### Summary of Model Features {#measurementInvarianceConfiguralModelFeatures}
-
-```{r}
-summary(configuralInvarianceModel)
-```
-
-##### Model Syntax in Table Form {#measurementInvarianceConfiguralModelTabular}
-
-```{r}
-lavaanify(cfaModel, ngroups = 2)
 ```
 
 #### Fit the Model {#measurementInvarianceConfiguralModelFit}
@@ -2342,40 +2007,11 @@ configuralInvarianceModel_fit <- cfa(
   estimator = "MLR")
 ```
 
-```{r configuralInvarianceModelFitFull, cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = "configuralInvarianceModel"}
-configuralInvarianceModelFullSyntax_fit <- lavaan(
-  cfaModel_configuralInvariance,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-```
-
-#### Model Summary {#measurementInvarianceConfiguralModelSummary}
-
-```{r}
-summary(
-  configuralInvarianceModel_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
-```{r}
-summary(
-  configuralInvarianceModelFullSyntax_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
 #### Model Fit {#measurementInvarianceConfiguralModelFitCriteria}
 
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`\index{structural equation modeling!measurement invariance!configural}
+\index{structural equation modeling!measurement invariance!configural}
 
 ```{r}
-fitMeasures(configuralInvarianceModel_fit)
-
 configuralInvarianceModelFitIndices <- fitMeasures(
   configuralInvarianceModel_fit)[c(
     "cfi.robust", "rmsea.robust", "srmr")]
@@ -2406,23 +2042,12 @@ lavaan_dmacs(configuralInvarianceModel_fit)
 
 #### Equivalence Test {#measurementInvarianceConfiguralModelEquivalenceTest}
 
-The [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] contains the `equiv_chi()` function from @Counsell2020 that performs an equivalence test:\index{petersenlab package}\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test} https://osf.io/cqu8v.
+The `petersenlab` package [@R-petersenlab] contains the `equiv_chi()` function from @Counsell2020 that performs an equivalence test:\index{petersenlab package}\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test} https://osf.io/cqu8v.
 An equivalence test evaluates the null hypothesis that a model is equivalent to another model.\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
 In this case, the equivalence test evaluates the null hypothesis that a model is equivalent to another model in terms of (poor) fit.\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
 Here, we operationalize a mediocre-fitting model as a model whose RMSEA is .08 or greater.\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
 So, the equivalence test evaluates whether our invariance model fits significantly better than a mediocre-fitting model.\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
 Thus, a statistically significant *p*-value indicates that our invariance model fits significantly better than the mediocre-fitting model (i.e., that invariance is established), whereas a non-significant *p*-value indicates that our invariance model does not fit significantly better than the mediocre-fitting model (i.e., that invariance is failed).\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
-
-```{r, eval = FALSE, class.source = "fold-hide"}
-equiv_chi <- function(alpha = .05, chi, df, m, N_sample, popRMSEA = .08){
-  Fml <- chi/(N_sample - m)
-  popep <- (df * popRMSEA^2)/m
-  popdelt <- (N_sample - m) * popep
-  pval <- pchisq(chi, df, ncp = popdelt, lower.tail = TRUE)
-  res <- data.frame(chi, Fml, popep, popdelt, pval)
-  res
-}
-```
 
 The chi-square equivalence test is non-significant, suggesting that the model fit of the configural invariance model is not acceptable (i.e., it is not better than the mediocre-fitting model).\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
 In other words, configural invariance failed.\index{structural equation modeling!measurement invariance!configural}\index{chi-square!equivalence test}
@@ -2448,13 +2073,6 @@ A non-significant *p*-value indicates that the model does not fit signficantly w
 numPermutations <- 100
 ```
 
-For reproducibility, I set the seed below.
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`.
-**Warning**: this code takes a while to run based on $`r numPermutations`$ iterations.
-You can reduce the number of iterations to be faster.
-
 ```{r configuralInvarianceModelPermutation, results = "hide", cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = c("numPermutations","configuralInvarianceModelFit","fitIndices")}
 set.seed(52242)
 configuralInvarianceTest <- permuteMeasEq(
@@ -2464,7 +2082,7 @@ configuralInvarianceTest <- permuteMeasEq(
   uncon = NULL,
   AFIs = myAFIs,
   moreAFIs = moreAFIs,
-  parallelType = "multicore", #only 'snow' works on Windows, but right now, it is throwing an error
+  parallelType = "multicore", #only 'snow' works on Windows
   iseed = 52242)
 ```
 
@@ -2478,18 +2096,9 @@ configuralInvarianceTest
 The *p*-values are non-significant, indicating that the model does not fit signficantly worse than the best-possible fitting model.\index{structural equation modeling!measurement invariance!configural}
 In other words, configural invariance held.\index{structural equation modeling!measurement invariance!configural}
 
-#### Internal Consistency Reliability {#measurementInvarianceReliability}
-
-[Internal consistency reliability](#internalConsistency-reliability) of items composing the latent factors, as quantified by [omega ($\omega$)](#coefficientOmega) and [average variance extracted](#averageVarianceExtracted) (AVE), was estimated using the `semTools` package [@R-semTools].\index{reliability!internal consistency!omega}\index{reliability!internal consistency!average variance extracted}
-
-```{r}
-compRelSEM(configuralInvarianceModel_fit)
-AVE(configuralInvarianceModel_fit)
-```
-
 #### Path Diagram {#measurementInvariancePathDiagram}
 
-A path diagram of the model generated using the `semPlot` package [@R-semPlot] is in the figures below ("1" = group 1; "2" = group 2).
+A path diagram of the model is in figures below ("1" = group 1; "2" = group 2).\index{structural equation modeling!measurement invariance!configural}\index{structural equation modeling!path diagram}
 
 ```{r measurementInvariancePathDiagram, out.width = "100%", fig.align = "center", fig.cap = "Configural Invariance Model in Confirmatory Factor Analysis (1 = Group 1; 2 = Group 2)."}
 semPaths(
@@ -2513,27 +2122,8 @@ metricInvarianceModel <- measEq.syntax(
   ID.fac = "std.lv",
   group = "school",
   group.equal = "loadings")
-```
 
-```{r}
-cat(as.character(metricInvarianceModel))
-```
-
-```{r metricInvarianceModelSyntax2, cache = TRUE, cache.comments = FALSE, dependson = "metricInvarianceModelSyntax1"}
 metricInvarianceSyntax <- as.character(metricInvarianceModel)
-```
-
-##### Summary of Model Features {#measurementInvarianceMetricModelFeatures}
-
-```{r}
-summary(metricInvarianceModel)
-```
-
-#### Model Syntax in Table Form {#measurementInvarianceMetricModelTabular}
-
-```{r}
-lavaanify(metricInvarianceModel, ngroups = 2)
-lavaanify(cfaModel_metricInvariance, ngroups = 2)
 ```
 
 #### Fit the Model {#measurementInvarianceMetricModelFit}
@@ -2547,40 +2137,11 @@ metricInvarianceModel_fit <- cfa(
   estimator = "MLR")
 ```
 
-```{r metricInvarianceModelFitFull, cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = "metricInvarianceModel"}
-metricInvarianceModelFullSyntax_fit <- lavaan(
-  cfaModel_metricInvariance,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-```
-
-#### Model Summary {#measurementInvarianceMetricModelOutput}
-
-```{r}
-summary(
-  metricInvarianceModel_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
-```{r}
-summary(
-  metricInvarianceModelFullSyntax_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
 #### Model Fit {#measurementInvarianceMetricModelFitCriteria}
 
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`\index{structural equation modeling!measurement invariance!metric}
+\index{structural equation modeling!measurement invariance!metric}
 
 ```{r}
-fitMeasures(metricInvarianceModel_fit)
-
 metricInvarianceModelFitIndices <- fitMeasures(
   metricInvarianceModel_fit)[c(
     "cfi.robust", "rmsea.robust", "srmr")]
@@ -2615,19 +2176,10 @@ The metric invariance model did not fit significantly worse than the configural 
 This provides evidence of measurement invariance of factor loadings across groups.\index{structural equation modeling!measurement invariance!metric}\index{chi-square!difference test}\index{structural equation modeling!measurement invariance!configural}\index{structural equation modeling!factor loading}
 Measurement invariance of factor loadings across groups provides support for examining whether the groups show different associations of the factor with other constructs [@Little2007].\index{structural equation modeling!measurement invariance!metric}\index{structural equation modeling!factor loading}
 
-Below is a Satorra-Bentler scaled chi-square difference test, where $c0$ and $c1$ are the scaling correction factor for the nested model and comparison model, respectively; $d0$ and $d1$ are the degrees of freedom of the nested model and comparison model, respectively; and $T0$ and $T1$ are the chi-square values of the nested model and comparison model, respectively.\index{structural equation modeling!measurement invariance!metric}\index{nested model}\index{chi-square!difference test}
-
-```{r, class.source = "fold-hide"}
-satorraBentlerScaledChiSquareDifferenceTestStatistic <- function(T0, c0, d0, T1, c1, d1){
-    cd <- (d0 * c0 - d1*c1)/(d0 - d1)
-    TRd <- (T0*c0 - T1*c1)/cd
-    
-    return(TRd)
-}
-```
+The `petersenlab` package [@R-petersenlab] contains a function to perform a Satorra-Bentler scaled chi-square difference test, where $c0$ and $c1$ are the scaling correction factor for the nested model and comparison model, respectively; $d0$ and $d1$ are the degrees of freedom of the nested model and comparison model, respectively; and $T0$ and $T1$ are the chi-square values of the nested model and comparison model, respectively.\index{structural equation modeling!measurement invariance!metric}\index{nested model}\index{chi-square!difference test}
 
 ```{r}
-metricInvarianceModel_chisquareDiff <- 
+metricInvarianceModel_chisquareDiff <-
   satorraBentlerScaledChiSquareDifferenceTestStatistic(
     T0 = metricInvarianceModel_chisquare,
     c0 = metricInvarianceModel_chisquareScaling,
@@ -2642,15 +2194,16 @@ metricInvarianceModel_chisquareDiff
 ##### Compare Other Fit Criteria {#measurementInvarianceMetricModelCompareFitCriteria}
 
 ```{r}
-round(metricInvarianceModelFitIndices - configuralInvarianceModelFitIndices, digits = 3)
+round(
+  metricInvarianceModelFitIndices - configuralInvarianceModelFitIndices,
+  digits = 3)
 ```
 
 ##### Score-Based Test {#measurementInvarianceMetricModelScoreBasedTest}
 
 Score-based tests of measurement invariance are described by @Wang2014a.\index{structural equation modeling!measurement invariance!metric}
 
-```{r}
-coef(metricInvarianceModel_fit)
+```{r, eval = FALSE}
 coef(metricInvarianceModel_fit)[1:9]
 
 sctest(
@@ -2662,7 +2215,6 @@ sctest(
 
 ##### Equivalence Test {#measurementInvarianceMetricModelEquivalenceTest}
 
-The [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] contains the `equiv_chi()` function from @Counsell2020 that performs an equivalence test:\index{petersenlab package}\index{structural equation modeling!measurement invariance!metric}\index{chi-square!equivalence test} https://osf.io/cqu8v.
 The chi-square equivalence test is non-significant, suggesting that the model fit is not acceptable.\index{structural equation modeling!measurement invariance!metric}\index{chi-square!equivalence test}
 
 ```{r}
@@ -2693,14 +2245,7 @@ equiv_chi(
 
 ##### Permutation Test {#measurementInvarianceMetricModelPermutationTest}
 
-Permutation procedures for testing measurement invariance are described in [@Jorgensen2018].\index{structural equation modeling!measurement invariance!metric}
-
-For reproducibility, I set the seed below.
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`.
-**Warning**: this code takes a while to run based on $`r numPermutations`$ iterations.
-You can reduce the number of iterations to be faster.
+\index{structural equation modeling!measurement invariance!metric}
 
 ```{r metricInvarianceModelPermutation, results = "hide", cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = c("numPermutations","metricInvarianceModelFit","configuralInvarianceModelFit","fitIndices")}
 set.seed(52242)
@@ -2711,7 +2256,7 @@ metricInvarianceTest <- permuteMeasEq(
   uncon = configuralInvarianceModel_fit,
   AFIs = myAFIs,
   moreAFIs = moreAFIs,
-  parallelType = "multicore", #only 'snow' works on Windows, but right now, it is throwing an error
+  parallelType = "multicore", #only 'snow' works on Windows
   iseed = 52242)
 ```
 
@@ -2724,28 +2269,6 @@ metricInvarianceTest
 
 The *p*-values are non-significant, indicating that the model does not fit signficantly worse than the configural invariance model.\index{structural equation modeling!measurement invariance!metric}
 In other words, metric invariance held.\index{structural equation modeling!measurement invariance!metric}
-
-#### Internal Consistency Reliability {#measurementInvarianceMetricModelReliability}
-
-[Internal consistency reliability](#internalConsistency-reliability) of items composing the latent factors, as quantified by [omega ($\omega$)](#coefficientOmega) and [average variance extracted](#averageVarianceExtracted) (AVE), was estimated using the `semTools` package [@R-semTools].\index{reliability!internal consistency!omega}\index{reliability!internal consistency!average variance extracted}
-
-```{r}
-compRelSEM(metricInvarianceModel_fit)
-AVE(metricInvarianceModel_fit)
-```
-
-#### Path Diagram {#measurementInvarianceMetricModelPathDiagram}
-
-A path diagram of the model generated using the `semPlot` package [@R-semPlot] is below.
-
-```{r measurementInvarianceMetricModelPathDiagram, out.width = "100%", fig.align = "center", fig.cap = "Metric Invariance Model in Confirmatory Factor Analysis."}
-semPaths(
-  metricInvarianceModel_fit,
-  what = "est",
-  layout = "tree2",
-  ask = FALSE,
-  edge.label.cex = 1.2)
-```
 
 ### Scalar ("Strong Factorial") Invariance Model {#measurementInvarianceScalarModel}
 
@@ -2760,28 +2283,13 @@ scalarInvarianceModel <- measEq.syntax(
   ID.fac = "std.lv",
   group = "school",
   group.equal = c("loadings","intercepts"))
-```
 
-```{r}
-cat(as.character(scalarInvarianceModel))
-```
-
-```{r scalarInvarianceModelSyntax2, cache = TRUE, cache.comments = FALSE, dependson = "scalarInvarianceModelSyntax1"}
 scalarInvarianceSyntax <- as.character(scalarInvarianceModel)
 ```
 
 ##### Summary of Model Features {#measurementInvarianceScalarModelFeatures}
 
-```{r}
-summary(scalarInvarianceModel)
-```
-
 #### Model Syntax in Table Form {#measurementInvarianceScalarModelTabular}
-
-```{r}
-lavaanify(scalarInvarianceModel, ngroups = 2)
-lavaanify(cfaModel_scalarInvariance, ngroups = 2)
-```
 
 #### Fit the Model {#measurementInvarianceScalarModelFit}
 
@@ -2794,40 +2302,11 @@ scalarInvarianceModel_fit <- cfa(
   estimator = "MLR")
 ```
 
-```{r scalarInvarianceModelFitFull, cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = "scalarInvarianceModel"}
-scalarInvarianceModelFullSyntax_fit <- lavaan(
-  cfaModel_scalarInvariance,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-```
-
-#### Model Summary {#measurementInvarianceScalarModelOutput}
-
-```{r}
-summary(
-  scalarInvarianceModel_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
-```{r}
-summary(
-  scalarInvarianceModelFullSyntax_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
 #### Model Fit {#measurementInvarianceScalarModelFitCriteria}
 
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`\index{structural equation modeling!measurement invariance!scalar}
+\index{structural equation modeling!measurement invariance!scalar}
 
 ```{r}
-fitMeasures(scalarInvarianceModel_fit)
-
 scalarInvarianceModelFitIndices <- fitMeasures(
   scalarInvarianceModel_fit)[c(
     "cfi.robust", "rmsea.robust", "srmr")]
@@ -2869,6 +2348,7 @@ scalarInvarianceModel_chisquareDiff <-
     c0 = scalarInvarianceModel_chisquareScaling,
     d0 = scalarInvarianceModel_df,
     T1 = metricInvarianceModel_chisquare,
+    c1 = metricInvarianceModel_chisquareScaling,
     d1 = metricInvarianceModel_df)
 
 scalarInvarianceModel_chisquareDiff
@@ -2886,8 +2366,7 @@ round(
 
 Score-based tests of measurement invariance are described by @Wang2014a.\index{structural equation modeling!measurement invariance!scalar}
 
-```{r}
-coef(scalarInvarianceModel_fit)
+```{r, eval = FALSE}
 coef(scalarInvarianceModel_fit)[10:18]
 
 sctest(
@@ -2899,7 +2378,6 @@ sctest(
 
 ##### Equivalence Test {#measurementInvarianceScalarModelEquivalenceTest}
 
-The [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] contains the `equiv_chi()` function from @Counsell2020 that performs an equivalence test:\index{petersenlab package}\index{structural equation modeling!measurement invariance!scalar}\index{chi-square!equivalence test} https://osf.io/cqu8v.
 The chi-square equivalence test is non-significant, suggesting that the model fit is not acceptable.\index{structural equation modeling!measurement invariance!scalar}\index{chi-square!equivalence test}
 
 ```{r}
@@ -2930,14 +2408,7 @@ equiv_chi(
 
 ##### Permutation Test {#measurementInvarianceScalarModelPermutationTest}
 
-Permutation procedures for testing measurement invariance are described in [@Jorgensen2018].\index{structural equation modeling!measurement invariance!scalar}
-For reproducibility, I set the seed below.
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`\index{structural equation modeling!measurement invariance!scalar}
-
-**Warning**: this code takes a while to run based on `r numPermutations` iterations.
-You can reduce the number of iterations to be faster.
+\index{structural equation modeling!measurement invariance!scalar}
 
 ```{r scalarInvarianceModelPermutation, results = "hide", cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = c("numPermutations","scalarInvarianceModelFit","metricInvarianceModelFit","fitIndices")}
 set.seed(52242)
@@ -2948,7 +2419,7 @@ scalarInvarianceTest <- permuteMeasEq(
   uncon = metricInvarianceModel_fit,
   AFIs = myAFIs,
   moreAFIs = moreAFIs,
-  parallelType = "multicore", #only 'snow' works on Windows, but right now, it is throwing an error
+  parallelType = "multicore", #only 'snow' works on Windows
   iseed = 52242)
 ```
 
@@ -2961,28 +2432,6 @@ scalarInvarianceTest
 
 The *p*-values are significant, indicating that the model fit signficantly worse than the metric invariance model.\index{structural equation modeling!measurement invariance!scalar}
 In other words, scalar invariance failed.\index{structural equation modeling!measurement invariance!scalar}
-
-#### Internal Consistency Reliability {#measurementInvarianceScalarModelReliability}
-
-[Internal consistency reliability](#internalConsistency-reliability) of items composing the latent factors, as quantified by [omega ($\omega$)](#coefficientOmega) and [average variance extracted](#averageVarianceExtracted) (AVE), was estimated using the `semTools` package [@R-semTools].\index{reliability!internal consistency!omega}\index{reliability!internal consistency!average variance extracted}
-
-```{r}
-compRelSEM(scalarInvarianceModel_fit)
-AVE(scalarInvarianceModel_fit)
-```
-
-#### Path Diagram {#measurementInvarianceScalarModelPathDiagram}
-
-A path diagram of the model generated using the `semPlot` package [@R-semPlot] is below.
-
-```{r measurementInvarianceScalarModelPathDiagram, out.width = "100%", fig.align = "center", fig.cap = "Scalar Invariance Model in Confirmatory Factor Analysis."}
-semPaths(
-  scalarInvarianceModel_fit,
-  what = "est",
-  layout = "tree2",
-  ask = FALSE,
-  edge.label.cex = 1.2)
-```
 
 ### Residual ("Strict Factorial") Invariance Model {#measurementInvarianceResidualModel}
 
@@ -2997,27 +2446,8 @@ residualInvarianceModel <- measEq.syntax(
   ID.fac = "std.lv",
   group = "school",
   group.equal = c("loadings","intercepts","residuals"))
-```
 
-```{r}
-cat(as.character(residualInvarianceModel))
-```
-
-```{r residualInvarianceModelSyntax2, cache = TRUE, cache.comments = FALSE, dependson = "residualInvarianceModelSyntax1"}
 residualInvarianceSyntax <- as.character(residualInvarianceModel)
-```
-
-##### Summary of Model Features {#measurementInvarianceResidualModelFeatures}
-
-```{r}
-summary(residualInvarianceModel)
-```
-
-#### Model Syntax in Table Form {#measurementInvarianceResidualModelTabular}
-
-```{r}
-lavaanify(residualInvarianceModel, ngroups = 2)
-lavaanify(cfaModel_residualInvariance, ngroups = 2)
 ```
 
 #### Fit the Model {#measurementInvarianceResidualModelFit}
@@ -3031,40 +2461,11 @@ residualInvarianceModel_fit <- cfa(
   estimator = "MLR")
 ```
 
-```{r residualInvarianceModelFitFull, cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = "residualInvarianceModel"}
-residualInvarianceModelFullSyntax_fit <- lavaan(
-  cfaModel_residualInvariance,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-```
-
-#### Model Summary {#measurementInvarianceResidualModelOutput}
-
-```{r}
-summary(
-  residualInvarianceModel_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
-```{r}
-summary(
-  residualInvarianceModelFullSyntax_fit,
-  fit.measures = TRUE,
-  standardized = TRUE,
-  rsquare = TRUE)
-```
-
 #### Model Fit {#measurementInvarianceResidualModelFitCriteria}
 
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`\index{structural equation modeling!measurement invariance!residual}
+\index{structural equation modeling!measurement invariance!residual}
 
 ```{r}
-fitMeasures(residualInvarianceModel_fit)
-
 residualInvarianceModelFitIndices <- fitMeasures(
   residualInvarianceModel_fit)[c(
     "cfi.robust", "rmsea.robust", "srmr")]
@@ -3122,8 +2523,7 @@ round(residualInvarianceModelFitIndices - scalarInvarianceModelFitIndices,
 
 Score-based tests of measurement invariance are described by @Wang2014a.\index{structural equation modeling!measurement invariance!residual}
 
-```{r}
-coef(residualInvarianceModel_fit)
+```{r, eval = FALSE}
 coef(residualInvarianceModel_fit)[19:27]
 
 sctest(
@@ -3135,7 +2535,6 @@ sctest(
 
 ##### Equivalence Test {#measurementInvarianceResidualModelEquivalenceTest}
 
-The [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] contains the `equiv_chi()` function from @Counsell2020 that performs an equivalence test:\index{petersenlab package}\index{structural equation modeling!measurement invariance!residual}\index{chi-square!equivalence test} https://osf.io/cqu8v.
 The chi-square equivalence test is non-significant, suggesting that the model fit is not acceptable.\index{structural equation modeling!measurement invariance!residual}\index{chi-square!equivalence test}
 The equivalence test of the chi-square difference test is non-significant, suggesting that the degree of worsening of model fit is not acceptable.\index{structural equation modeling!measurement invariance!residual}\index{chi-square!equivalence test}
 
@@ -3167,14 +2566,7 @@ equiv_chi(
 
 ##### Permutation Test {#measurementInvarianceResidualModelPermutationTest}
 
-Permutation procedures for testing measurement invariance are described in [@Jorgensen2018].\index{structural equation modeling!measurement invariance!residual}\index{chi-square!equivalence test}
-For reproducibility, I set the seed below.
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
-You can specify the null model as the baseline model using: `baseline.model = nullModelFit`.
-
-**Warning**: this code takes a while to run based on $`r numPermutations`$ iterations.
-You can reduce the number of iterations to be faster.
+\index{structural equation modeling!measurement invariance!residual}\index{chi-square!equivalence test}
 
 ```{r residualInvarianceModelPermutation, results = "hide", cache = TRUE, cache.extra = list(getRversion(), packageVersion("lavaan"), packageVersion("semTools"), HolzingerSwineford1939), cache.comments = FALSE, dependson = c("numPermutations","residualInvarianceModelFit","scalarInvarianceModelFit","fitIndices")}
 set.seed(52242)
@@ -3185,7 +2577,7 @@ residualInvarianceTest <- permuteMeasEq(
   uncon = scalarInvarianceModel_fit,
   AFIs = myAFIs,
   moreAFIs = moreAFIs,
-  parallelType = "multicore", #only 'snow' works on Windows, but right now, it is throwing an error
+  parallelType = "multicore", #only 'snow' works on Windows
   iseed = 52242)
 ```
 
@@ -3198,27 +2590,6 @@ residualInvarianceTest
 
 The *p*-values are non-significant, indicating that the model did not fit signficantly worse than the scalar invariance model.\index{structural equation modeling!measurement invariance!residual}\index{chi-square!equivalence test}
 
-#### Internal Consistency Reliability {#measurementInvarianceResidualModelReliability}
-
-[Internal consistency reliability](#internalConsistency-reliability) of items composing the latent factors, as quantified by [omega ($\omega$)](#coefficientOmega) and [average variance extracted](#averageVarianceExtracted) (AVE), was estimated using the `semTools` package [@R-semTools].\index{reliability!internal consistency!omega}\index{reliability!internal consistency!average variance extracted}
-
-```{r}
-compRelSEM(residualInvarianceModel_fit)
-AVE(residualInvarianceModel_fit)
-```
-
-#### Path Diagram {#measurementInvarianceResidualModelPathDiagram}
-
-A path diagram of the model generated using the `semPlot` package [@R-semPlot] is below.
-
-```{r measurementInvarianceResidualModelPathDiagram, out.width = "100%", fig.align = "center", fig.cap = "Residual Invariance Model in Confirmatory Factor Analysis."}
-semPaths(
-  residualInvarianceModel_fit,
-  what = "est",
-  layout = "tree2",
-  ask = FALSE,
-  edge.label.cex = 1.2)
-```
 
 ### Addressing Measurement Non-Invariance {#addressingMeasurementNonInvariance}
 
@@ -3230,548 +2601,7 @@ When detecting measurement non-invariance in a given parameter (e.g., factor loa
 
 In the example above, we detected measurement non-invariance of intercepts.\index{structural equation modeling!intercept}\index{structural equation modeling!measurement invariance}
 One approach to identify measurement non-invariance is to iteratively add constraints to a model that allows the given parameter (intercepts) to differ across groups.\index{structural equation modeling!intercept}\index{structural equation modeling!measurement invariance}
-So, we will use the metric invariance model as the baseline model (in which item intercepts are allowed to differ across groups), and iteratively add constraints to identify which item(s) show non-invariant intercepts across groups.\index{structural equation modeling!intercept}\index{structural equation modeling!measurement invariance}\index{structural equation modeling!measurement invariance!metric}
-
-##### Variable 1 {#measurementInvarianceAddConstraintsVariable1}
-
-Variable 1 does not have non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV1 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV1_fit <- lavaan(
-  cfaModel_metricInvarianceV1,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV1_fit)
-```
-
-##### Variable 2 {#measurementInvarianceAddConstraintsVariable2}
-
-Variable 2 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV2 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ c(intx1, intx1)*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV2_fit <- lavaan(
-  cfaModel_metricInvarianceV2,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV2_fit)
-```
-
-Variable 2 appears to have larger intercepts in group 2 than in group 1:\index{structural equation modeling!intercept}
-
-```{r}
-summary(metricInvarianceModel_fit)
-```
-
-Thus, in subsequent models, we would allow variable 2 to have different intercepts across groups.\index{structural equation modeling!intercept}
-
-##### Variable 3 {#measurementInvarianceAddConstraintsVariable3}
-
-Variable 3 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV3 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ c(intx1, intx1)*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV3_fit <- lavaan(
-  cfaModel_metricInvarianceV3,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV3_fit)
-```
-
-##### Variable 4 {#measurementInvarianceAddConstraintsVariable4}
-
-Variable 4 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV4 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ c(intx1, intx1)*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV4_fit <- lavaan(
-  cfaModel_metricInvarianceV4,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV4_fit)
-```
-
-##### Variable 5 {#measurementInvarianceAddConstraintsVariable5}
-
-Variable 5 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV5 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ c(intx1, intx1)*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV5_fit <- lavaan(
-  cfaModel_metricInvarianceV5,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV5_fit)
-```
-
-##### Variable 6 {#measurementInvarianceAddConstraintsVariable6}
-
-Variable 6 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV6 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ c(intx1, intx1)*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV6_fit <- lavaan(
-  cfaModel_metricInvarianceV6,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV6_fit)
-```
-
-##### Variable 7 {#measurementInvarianceAddConstraintsVariable7}
-
-Variable 7 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV7 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ c(intx1, intx1)*1
- x8 ~ NA*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV7_fit <- lavaan(
-  cfaModel_metricInvarianceV7,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV7_fit)
-```
-
-##### Variable 8 {#measurementInvarianceAddConstraintsVariable8}
-
-Variable 8 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV8 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ c(intx1, intx1)*1
- x9 ~ NA*1
-'
-
-cfaModel_metricInvarianceV8_fit <- lavaan(
-  cfaModel_metricInvarianceV8,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV8_fit)
-```
-
-##### Variable 9 {#measurementInvarianceAddConstraintsVariable9}
-
-Variable 9 has non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_metricInvarianceV9 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively fix intercepts of manifest variables across groups
- x1 ~ c(intx1, intx1)*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ c(intx1, intx1)*1
-'
-
-cfaModel_metricInvarianceV9_fit <- lavaan(
-  cfaModel_metricInvarianceV9,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_metricInvarianceV9_fit)
-```
-
-##### Summary {#measurementInvarianceAddConstraintsSummary}
+So, we can use the metric invariance model as the baseline model (in which item intercepts are allowed to differ across groups), and iteratively add constraints to identify which item(s) show non-invariant intercepts across groups.\index{structural equation modeling!intercept}\index{structural equation modeling!measurement invariance}\index{structural equation modeling!measurement invariance!metric}
 
 When iteratively adding constraints, item 1 showed measurement invariance of intercepts, but all other items showed measurement non-invariance of intercepts.\index{structural equation modeling!measurement invariance}\index{structural equation modeling!intercept}
 This could be due to the selection of starting with item 1 as the first constraint.\index{structural equation modeling!measurement invariance}\index{structural equation modeling!intercept}
@@ -3780,550 +2610,7 @@ We could try applying constraints in a different order to see the extent to whic
 #### Iteratively drop constraints to identify measurement non-invariance {#measurementInvarianceDropConstraints}
 
 Another approach to identify measurement non-invariance is to iteratively drop constraints to a model that constrains the given parameter (intercepts) to be the same across groups.\index{structural equation modeling!measurement invariance}\index{structural equation modeling!intercept}
-So, we will use the scalar invariance model as the baseline model (in which item intercepts are constrained to be the same across groups), and we will iteratively drop constraints to identify which the items for which measurement invariance becomes established (relative to the metric invariance model which allows item intercepts to differ across groups), and therefore, identifies which item(s) show non-invariant intercepts across groups.\index{structural equation modeling!measurement invariance}\index{structural equation modeling!measurement invariance!scalar}\index{structural equation modeling!intercept}
-
-##### Variable 1 {#measurementInvarianceDropConstraintsVariable1}
-
-Measurement invariance does not yet become established when freeing intercepts of variable 1 across groups.\index{structural equation modeling!intercept}
-This suggests that, whether or not variable 1 shows non-invariant intercepts, there are other items that show non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV1 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ c(intx2, intx2)*1
- x3 ~ c(intx3, intx3)*1
- x4 ~ c(intx4, intx4)*1
- x5 ~ c(intx5, intx5)*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV1_fit <- lavaan(
-  cfaModel_scalarInvarianceV1,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV1_fit)
-```
-
-##### Variable 2 {#measurementInvarianceDropConstraintsVariable2}
-
-Measurement invariance does not yet become established when freeing intercepts of variable 2 across groups.\index{structural equation modeling!intercept}
-This suggests that, whether or not variables 1 and 2 show non-invariant intercepts, there are other items that show non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV2 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ c(intx3, intx3)*1
- x4 ~ c(intx4, intx4)*1
- x5 ~ c(intx5, intx5)*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV2_fit <- lavaan(
-  cfaModel_scalarInvarianceV2,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV2_fit)
-```
-
-##### Variable 3 {#measurementInvarianceDropConstraintsVariable3}
-
-Measurement invariance does not yet become established when freeing intercepts of variable 3 across groups.\index{structural equation modeling!intercept}
-This suggests that, whether or not variables 1, 2, and 3 show non-invariant intercepts, there are other items that show non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV3 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ c(intx4, intx4)*1
- x5 ~ c(intx5, intx5)*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV3_fit <- lavaan(
-  cfaModel_scalarInvarianceV3,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV3_fit)
-```
-
-##### Variable 4 {#measurementInvarianceDropConstraintsVariable4}
-
-Measurement invariance does not yet become established when freeing intercepts of variable 4 across groups.\index{structural equation modeling!intercept}
-This suggests that, whether or not variables 1, 2, 3, and 4 show non-invariant intercepts, there are other items that show non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV4 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ c(intx5, intx5)*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV4_fit <- lavaan(
-  cfaModel_scalarInvarianceV4,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV4_fit)
-```
-
-##### Variable 5 {#measurementInvarianceDropConstraintsVariable5}
-
-Measurement invariance does not yet become established when freeing intercepts of variable 5 across groups.\index{structural equation modeling!intercept}
-This suggests that, whether or not variables 1, 2, 3, 4, and 5 show non-invariant intercepts, there are other items that show non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV5 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ c(intx6, intx6)*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV5_fit <- lavaan(
-  cfaModel_scalarInvarianceV5,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV5_fit)
-```
-
-##### Variable 6 {#measurementInvarianceDropConstraintsVariable6}
-
-Measurement invariance does not yet become established when freeing intercepts of variable 6 across groups.\index{structural equation modeling!intercept}
-This suggests that, whether or not variables 1, 2, 3, 4, 5, and 6 show non-invariant intercepts, there are other items that show non-invariant intercepts.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV6 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ c(intx7, intx7)*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV6_fit <- lavaan(
-  cfaModel_scalarInvarianceV6,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV6_fit)
-```
-
-##### Variable 7 {#measurementInvarianceDropConstraintsVariable7}
-
-Measurement invariance becomes established when freeing intercepts of variable 7 across groups.\index{structural equation modeling!intercept}
-This suggests that item 7 shows non-invariant intercepts across groups, and that measurement invariance holds when constraining items 8 and 9 to be invariant across groups.\index{structural equation modeling!intercept}
-There may also be other items, especially among the preceding items (variables 1–6), that show non-invariant intercepts across groups.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV7 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV7_fit <- lavaan(
-  cfaModel_scalarInvarianceV7,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV7_fit)
-```
-
-##### Variable 8 {#measurementInvarianceDropConstraintsVariable8}
-
-Measurement invariance continues to hold when freeing intercepts of variable 8 across groups.\index{structural equation modeling!intercept}
-This suggests that variable 8 does not show non-invariant intercepts across groups, at least when the other intercepts have been freed.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV8 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ NA*1
- x9 ~ c(intx9, intx9)*1
-'
-
-cfaModel_scalarInvarianceV8_fit <- lavaan(
-  cfaModel_scalarInvarianceV8,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV8_fit)
-```
-
-##### Variable 9 {#measurementInvarianceDropConstraintsVariable9}
-
-Measurement invariance continues to hold when freeing intercepts of variable 9 across groups (even after constraining intercepts of variable 8 across groups).\index{structural equation modeling!intercept}
-This suggests that variable 9 does not show non-invariant intercepts across groups, at least when the other intercepts have been freed.\index{structural equation modeling!intercept}
-
-```{r}
-cfaModel_scalarInvarianceV9 <- '
- #Fix factor loadings to be the same across groups
- visual  =~ c(lambdax1,lambdax1)*x1 + c(lambdax2,lambdax2)*x2 + c(lambdax3,lambdax3)*x3
- textual =~ c(lambdax4,lambdax4)*x4 + c(lambdax5,lambdax5)*x5 + c(lambdax6,lambdax6)*x6
- speed   =~ c(lambdax7,lambdax7)*x7 + c(lambdax8,lambdax8)*x8 + c(lambdax9,lambdax9)*x9
- 
- #Fix latent means to zero
- visual ~ 0
- textual ~ 0
- speed ~ 0
- 
- #Fix latent variances to one in group 1; free latent variances in group 2
- visual ~~ c(1, NA)*visual
- textual ~~ c(1, NA)*textual
- speed ~~ c(1, NA)*speed
- 
- #Estimate covariances among latent variables
- visual ~~ textual
- visual ~~ speed
- textual ~~ speed
- 
- #Estimate residual variances of manifest variables
- x1 ~~ x1
- x2 ~~ x2
- x3 ~~ x3
- x4 ~~ x4
- x5 ~~ x5
- x6 ~~ x6
- x7 ~~ x7
- x8 ~~ x8
- x9 ~~ x9
- 
- #Iteratively free intercepts across groups
- x1 ~ NA*1
- x2 ~ NA*1
- x3 ~ NA*1
- x4 ~ NA*1
- x5 ~ NA*1
- x6 ~ NA*1
- x7 ~ NA*1
- x8 ~ c(intx8, intx8)*1
- x9 ~ NA*1
-'
-
-cfaModel_scalarInvarianceV9_fit <- lavaan(
-  cfaModel_scalarInvarianceV9,
-  data = HolzingerSwineford1939,
-  group = "school",
-  missing = "ML",
-  estimator = "MLR")
-
-anova(metricInvarianceModel_fit, cfaModel_scalarInvarianceV9_fit)
-```
-
-##### Summary {#measurementInvarianceDropConstraintsSummary}
+So, we can use the scalar invariance model as the baseline model (in which item intercepts are constrained to be the same across groups), and we can iteratively drop constraints to identify which the items for which measurement invariance becomes established (relative to the metric invariance model which allows item intercepts to differ across groups), and therefore, identifies which item(s) show non-invariant intercepts across groups.\index{structural equation modeling!measurement invariance}\index{structural equation modeling!measurement invariance!scalar}\index{structural equation modeling!intercept}
 
 When iteratively dropping constraints, measurement invariance became established when freeing the intercepts for items 1–7 across groups.
 This suggests that items 7, 8, and 9 show measurement invariance of intercepts across groups.\index{structural equation modeling!measurement invariance}\index{structural equation modeling!intercept}
@@ -4356,571 +2643,3 @@ However, even if a test does not show bias does not mean that the test is [fair]
 ## Suggested Readings {#readings-bias}
 
 @Putnick2016; @Cole1981; @Fernandez2018; @Reynolds2012; @Sackett1994; @Jonson2022
-
-## Exercises {#exercises-bias}
-
-```{r, include = FALSE}
-library("MOTE")
-
-# Predictive Bias
-summary(lm(bpi_antisocialT2Sum ~ bpi_antisocialT1Sum + sex + bpi_antisocialT1Sum:sex, data = cnlsy))
-
-plot(bpi_antisocialT2Sum ~ bpi_antisocialT1Sum, data = cnlsy, type = "n", xlab = "predictor", ylab = "criterion")
-points(cnlsy$bpi_antisocialT1Sum[which(cnlsy$sex == "male")], cnlsy$bpi_antisocialT2Sum[which(cnlsy$sex == "male")], pch = 20, col = "blue")
-points(cnlsy$bpi_antisocialT1Sum[which(cnlsy$sex == "female")], cnlsy$bpi_antisocialT2Sum[which(cnlsy$sex == "female")], pch = 1, col = "red")
-abline(lm(bpi_antisocialT2Sum ~ bpi_antisocialT1Sum, data = cnlsy[which(cnlsy$sex == "male"),]), lty = 1, col = "blue")
-abline(lm(bpi_antisocialT2Sum ~ bpi_antisocialT1Sum, data = cnlsy[which(cnlsy$sex == "female"),]), lty = 2, col = "red")
-legend("bottomright", c("Male","Female"), lty = c(1,2), pch = c(20,1), col = c("blue","red"))
-
-cnlsy$preventative <- NA
-cnlsy$preventative[cnlsy$bpi_antisocialT1Sum > 6] <- 1
-cnlsy$preventative[cnlsy$bpi_antisocialT1Sum <= 6] <- 0
-
-cnlsy$disorder <- NA
-cnlsy$disorder[cnlsy$bpi_antisocialT2Sum > 6] <- 1
-cnlsy$disorder[cnlsy$bpi_antisocialT2Sum <= 6] <- 0
-
-srBoys <- selectionRatio(TP = length(which(cnlsy$preventative == 1 & cnlsy$disorder == 1 & cnlsy$sex == "male")),
-               TN = length(which(cnlsy$preventative == 0 & cnlsy$disorder == 0 & cnlsy$sex == "male")),
-               FP = length(which(cnlsy$preventative == 1 & cnlsy$disorder == 0 & cnlsy$sex == "male")),
-               FN = length(which(cnlsy$preventative == 0 & cnlsy$disorder == 1 & cnlsy$sex == "male")))
-
-srGirls <- selectionRatio(TP = length(which(cnlsy$preventative == 1 & cnlsy$disorder == 1 & cnlsy$sex == "female")),
-               TN = length(which(cnlsy$preventative == 0 & cnlsy$disorder == 0 & cnlsy$sex == "female")),
-               FP = length(which(cnlsy$preventative == 1 & cnlsy$disorder == 0 & cnlsy$sex == "female")),
-               FN = length(which(cnlsy$preventative == 0 & cnlsy$disorder == 1 & cnlsy$sex == "female")))
-
-# DIF
-itemstats(data = cnlsy[,c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7")],
-          group = cnlsy$sex,
-          ts.tables = TRUE)
-
-unconstrainedModel_ex <- multipleGroup(data = cnlsy[,c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7")],
-                                    model = 1,
-                                    group = cnlsy$sex,
-                                    SE = TRUE)
-
-summary(unconstrainedModel_ex)
-coef(unconstrainedModel_ex, simplify = TRUE, IRTpars = TRUE)
-
-constrainedModel_ex <- multipleGroup(data = cnlsy[,c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7")],
-                                  model = 1,
-                                  group = cnlsy$sex,
-                                  invariance = c(c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7"), "free_means", "free_var"),
-                                  SE = TRUE)
-
-summary(constrainedModel_ex)
-coef(constrainedModel_ex, simplify = TRUE, IRTpars = TRUE)
-
-unconstrainedVsConstrainedAnova_ex <- anova(unconstrainedModel_ex, constrainedModel_ex)
-unconstrainedVsConstrainedChiSquare_ex <- unconstrainedVsConstrainedAnova_ex$X2[2]
-unconstrainedVsConstrainedDF_ex <- unconstrainedVsConstrainedAnova_ex$df[2]
-
-difDropItems_ex <- DIF(constrainedModel_ex,
-                    c("a1","d1","d2"),
-                    scheme = "drop",
-                    simplify = TRUE)
-difDropItems_ex
-
-difDropItemsDiscrimination_ex <- DIF(constrainedModel_ex,
-                                  c("a1"),
-                                  scheme = "drop",
-                                  simplify = TRUE)
-difDropItemsDiscrimination_ex
-
-difDropItemsSeverity_ex <- DIF(constrainedModel_ex,
-                            c("d1","d2"),
-                            scheme = "drop",
-                            simplify = TRUE)
-difDropItemsSeverity_ex
-
-difAddItems_ex <- DIF(unconstrainedModel_ex,
-                   c("a1","d1","d2"),
-                   scheme = "add",
-                   simplify = TRUE,
-                   plotdif = TRUE)
-difAddItems_ex
-
-difAddItemsDiscrimination_ex <- DIF(unconstrainedModel_ex,
-                                 c("a1"),
-                                 scheme = "add",
-                                 simplify = TRUE,
-                                 plotdif = TRUE)
-difAddItemsDiscrimination_ex
-
-difAddItemsSeverity_ex <- DIF(unconstrainedModel_ex,
-                           c("d1","d2"),
-                           scheme = "add",
-                           simplify = TRUE,
-                           plotdif = TRUE)
-difAddItemsSeverity_ex
-
-empirical_ES(unconstrainedModel_ex, DIF = FALSE)
-
-empirical_ES(unconstrainedModel_ex, DIF = FALSE, plot = TRUE)
-
-empirical_ES(unconstrainedModel_ex, DIF = TRUE)
-
-empirical_ES(unconstrainedModel_ex, DIF = TRUE, plot = TRUE)
-
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_1", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_2", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_3", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_4", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_5", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_6", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_7", type = "trace", par.settings = standard.theme("pdf", color = FALSE))
-
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_1", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_2", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_3", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_4", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_5", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_6", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_7", type = "info", par.settings = standard.theme("pdf", color = FALSE))
-
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_1", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_2", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_3", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_4", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_5", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_6", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-itemplot(unconstrainedModel_ex, "bpi_antisocialT2_7", type = "score", par.settings = standard.theme("pdf", color = FALSE))
-
-constrainedModelDropItem5_ex <- multipleGroup(data = cnlsy[,c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_6","bpi_antisocialT2_7")],
-                                           model = 1,
-                                           group = cnlsy$sex,
-                                           invariance = c(c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_6","bpi_antisocialT2_7"), "free_means", "free_var"),
-                                           SE = TRUE)
-
-coef(constrainedModelDropItem5_ex, simplify = TRUE)
-
-dropItem5ForMen_ex <- cnlsy
-dropItem5ForMen_ex[which(dropItem5ForMen_ex$sex == "male"), "bpi_antisocialT2_5"] <- NA
-
-constrainedModelDropItem5ForMen_ex <- multipleGroup(data = dropItem5ForMen_ex[,c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7")],
-                                                 model = 1,
-                                                 group = dropItem5ForMen_ex$sex,
-                                                 invariance = c(c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7"), "free_means", "free_var"),
-                                                 SE = TRUE)
-
-coef(constrainedModelDropItem5ForMen_ex, simplify = TRUE)
-
-constrainedModelResolveItem5_ex <- multipleGroup(data = cnlsy[,c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_5","bpi_antisocialT2_6","bpi_antisocialT2_7")],
-                                              model = 1,
-                                              group = cnlsy$sex,
-                                              invariance = c(c("bpi_antisocialT2_1","bpi_antisocialT2_2","bpi_antisocialT2_3","bpi_antisocialT2_4","bpi_antisocialT2_6","bpi_antisocialT2_7"), "free_means", "free_var"),
-                                              SE = TRUE)
-
-coef(constrainedModelResolveItem5_ex, simplify = TRUE)
-
-anova(constrainedModelDropItem5_ex, constrainedModel_ex)
-anova(constrainedModelDropItem5ForMen_ex, constrainedModel_ex)
-anova(constrainedModelResolveItem5_ex, constrainedModel_ex)
-
-difDropItemsNew_ex <- DIF(constrainedModelResolveItem5_ex,
-                       c("a1","d1","d2"),
-                       scheme = "drop",
-                       simplify = TRUE)
-difDropItemsNew_ex
-
-# Measurement Invariance
-
-nullModel_ex <- '
-# Fix residual variances of manifest variables to be equal across groups
-bpi_antisocialT1_1 ~~ psi1*bpi_antisocialT1_1
-bpi_antisocialT1_2 ~~ psi2*bpi_antisocialT1_2
-bpi_antisocialT1_3 ~~ psi3*bpi_antisocialT1_3
-bpi_antisocialT1_4 ~~ psi4*bpi_antisocialT1_4
-bpi_antisocialT1_5 ~~ psi4*bpi_antisocialT1_5
-bpi_antisocialT1_6 ~~ psi6*bpi_antisocialT1_6
-bpi_antisocialT1_7 ~~ psi7*bpi_antisocialT1_7
-
-bpi_antisocialT2_1 ~~ psi1*bpi_antisocialT2_1
-bpi_antisocialT2_2 ~~ psi2*bpi_antisocialT2_2
-bpi_antisocialT2_3 ~~ psi3*bpi_antisocialT2_3
-bpi_antisocialT2_4 ~~ psi4*bpi_antisocialT2_4
-bpi_antisocialT2_5 ~~ psi4*bpi_antisocialT2_5
-bpi_antisocialT2_6 ~~ psi6*bpi_antisocialT2_6
-bpi_antisocialT2_7 ~~ psi7*bpi_antisocialT2_7
-
-# Fix intercepts of manifest variables to be equal across groups
-bpi_antisocialT1_1 ~ tau1*1
-bpi_antisocialT1_2 ~ tau2*1
-bpi_antisocialT1_3 ~ tau3*1
-bpi_antisocialT1_4 ~ tau4*1
-bpi_antisocialT1_5 ~ tau4*1
-bpi_antisocialT1_6 ~ tau6*1
-bpi_antisocialT1_7 ~ tau7*1
-
-bpi_antisocialT2_1 ~ tau1*1
-bpi_antisocialT2_2 ~ tau2*1
-bpi_antisocialT2_3 ~ tau3*1
-bpi_antisocialT2_4 ~ tau4*1
-bpi_antisocialT2_5 ~ tau4*1
-bpi_antisocialT2_6 ~ tau6*1
-bpi_antisocialT2_7 ~ tau7*1
-'
-
-cfaModel_ex <- '
- # Factor loadings
- t1 =~ bpi_antisocialT1_1 + bpi_antisocialT1_2 + bpi_antisocialT1_3 + bpi_antisocialT1_4 + bpi_antisocialT1_5 + bpi_antisocialT1_6 + bpi_antisocialT1_7
- t2 =~ bpi_antisocialT2_1 + bpi_antisocialT2_2 + bpi_antisocialT2_3 + bpi_antisocialT2_4 + bpi_antisocialT2_5 + bpi_antisocialT2_6 + bpi_antisocialT2_7
-'
-
-cfaModel_configuralInvariance_ex <- '
- # Factor loadings (free the factor loading of the first indicator)
- t1 =~ NA*bpi_antisocialT1_1 + bpi_antisocialT1_2 + bpi_antisocialT1_3 + bpi_antisocialT1_4 + bpi_antisocialT1_5 + bpi_antisocialT1_6 + bpi_antisocialT1_7
- t2 =~ NA*bpi_antisocialT2_1 + bpi_antisocialT2_2 + bpi_antisocialT2_3 + bpi_antisocialT2_4 + bpi_antisocialT2_5 + bpi_antisocialT2_6 + bpi_antisocialT2_7
- 
- # Fix latent means to zero
- t1 ~ 0
- t2 ~ 0
- 
- # Fix latent variances to one
- t1 ~~ 1*t1
- t2 ~~ 1*t2
- 
- # Estimate covariances among latent variables
- t1 ~~ t2
- 
- # Estimate residual variances of manifest variables
- bpi_antisocialT1_1 ~~ bpi_antisocialT1_1
- bpi_antisocialT1_2 ~~ bpi_antisocialT1_2
- bpi_antisocialT1_3 ~~ bpi_antisocialT1_3
- bpi_antisocialT1_4 ~~ bpi_antisocialT1_4
- bpi_antisocialT1_5 ~~ bpi_antisocialT1_5
- bpi_antisocialT1_6 ~~ bpi_antisocialT1_6
- bpi_antisocialT1_7 ~~ bpi_antisocialT1_7
-
- bpi_antisocialT2_1 ~~ bpi_antisocialT2_1
- bpi_antisocialT2_2 ~~ bpi_antisocialT2_2
- bpi_antisocialT2_3 ~~ bpi_antisocialT2_3
- bpi_antisocialT2_4 ~~ bpi_antisocialT2_4
- bpi_antisocialT2_5 ~~ bpi_antisocialT2_5
- bpi_antisocialT2_6 ~~ bpi_antisocialT2_6
- bpi_antisocialT2_7 ~~ bpi_antisocialT2_7
- 
- # Free intercepts of manifest variables
- bpi_antisocialT1_1 ~ NA*1
- bpi_antisocialT1_2 ~ NA*1
- bpi_antisocialT1_3 ~ NA*1
- bpi_antisocialT1_4 ~ NA*1
- bpi_antisocialT1_5 ~ NA*1
- bpi_antisocialT1_6 ~ NA*1
- bpi_antisocialT1_7 ~ NA*1
-
- bpi_antisocialT2_1 ~ NA*1
- bpi_antisocialT2_2 ~ NA*1
- bpi_antisocialT2_3 ~ NA*1
- bpi_antisocialT2_4 ~ NA*1
- bpi_antisocialT2_5 ~ NA*1
- bpi_antisocialT2_6 ~ NA*1
- bpi_antisocialT2_7 ~ NA*1
-'
-
-cfaModel_metricInvariance_ex <- '
- # Fix factor loadings to be the same across groups
- t1 =~ lambdax1*bpi_antisocialT1_1 + lambdax2*bpi_antisocialT1_2 + lambdax3*bpi_antisocialT1_3 + lambdax4*bpi_antisocialT1_4 + lambdax5*bpi_antisocialT1_5 + lambdax6*bpi_antisocialT1_6 + lambdax7*bpi_antisocialT1_7
- t2 =~ lambdax1*bpi_antisocialT2_1 + lambdax2*bpi_antisocialT2_2 + lambdax3*bpi_antisocialT2_3 + lambdax4*bpi_antisocialT2_4 + lambdax5*bpi_antisocialT2_5 + lambdax6*bpi_antisocialT2_6 + lambdax7*bpi_antisocialT2_7
-
- # Fix latent means to zero
- t1 ~ 0
- t2 ~ 0
- 
- # Fix latent variances to one in group 1; free latent variances in group 2
- t1 ~~ 1*t1
- t2 ~~ NA*t2
- 
- # Estimate covariances among latent variables
- t1 ~~ t2
- 
- # Estimate residual variances of manifest variables
- bpi_antisocialT1_1 ~~ bpi_antisocialT1_1
- bpi_antisocialT1_2 ~~ bpi_antisocialT1_2
- bpi_antisocialT1_3 ~~ bpi_antisocialT1_3
- bpi_antisocialT1_4 ~~ bpi_antisocialT1_4
- bpi_antisocialT1_5 ~~ bpi_antisocialT1_5
- bpi_antisocialT1_6 ~~ bpi_antisocialT1_6
- bpi_antisocialT1_7 ~~ bpi_antisocialT1_7
-
- bpi_antisocialT2_1 ~~ bpi_antisocialT2_1
- bpi_antisocialT2_2 ~~ bpi_antisocialT2_2
- bpi_antisocialT2_3 ~~ bpi_antisocialT2_3
- bpi_antisocialT2_4 ~~ bpi_antisocialT2_4
- bpi_antisocialT2_5 ~~ bpi_antisocialT2_5
- bpi_antisocialT2_6 ~~ bpi_antisocialT2_6
- bpi_antisocialT2_7 ~~ bpi_antisocialT2_7
- 
- # Free intercepts of manifest variables
- bpi_antisocialT1_1 ~ NA*1
- bpi_antisocialT1_2 ~ NA*1
- bpi_antisocialT1_3 ~ NA*1
- bpi_antisocialT1_4 ~ NA*1
- bpi_antisocialT1_5 ~ NA*1
- bpi_antisocialT1_6 ~ NA*1
- bpi_antisocialT1_7 ~ NA*1
-
- bpi_antisocialT2_1 ~ NA*1
- bpi_antisocialT2_2 ~ NA*1
- bpi_antisocialT2_3 ~ NA*1
- bpi_antisocialT2_4 ~ NA*1
- bpi_antisocialT2_5 ~ NA*1
- bpi_antisocialT2_6 ~ NA*1
- bpi_antisocialT2_7 ~ NA*1
-'
-
-cfaModel_scalarInvariance_ex <- '
- # Fix factor loadings to be the same across groups
- t1 =~ lambdax1*bpi_antisocialT1_1 + lambdax2*bpi_antisocialT1_2 + lambdax3*bpi_antisocialT1_3 + lambdax4*bpi_antisocialT1_4 + lambdax5*bpi_antisocialT1_5 + lambdax6*bpi_antisocialT1_6 + lambdax7*bpi_antisocialT1_7
- t2 =~ lambdax1*bpi_antisocialT2_1 + lambdax2*bpi_antisocialT2_2 + lambdax3*bpi_antisocialT2_3 + lambdax4*bpi_antisocialT2_4 + lambdax5*bpi_antisocialT2_5 + lambdax6*bpi_antisocialT2_6 + lambdax7*bpi_antisocialT2_7
- 
- # Fix latent means to zero in group 1; free latent means in group 2
- t1 ~ 0
- t2 ~ NA*1
- 
- # Fix latent variances to one in group 1; free latent variances in group 2
- t1 ~~ 1*t1
- t2 ~~ NA*t2
- 
- # Estimate covariances among latent variables
- t1 ~~ t2
- 
- # Estimate residual variances of manifest variables
- bpi_antisocialT1_1 ~~ bpi_antisocialT1_1
- bpi_antisocialT1_2 ~~ bpi_antisocialT1_2
- bpi_antisocialT1_3 ~~ bpi_antisocialT1_3
- bpi_antisocialT1_4 ~~ bpi_antisocialT1_4
- bpi_antisocialT1_5 ~~ bpi_antisocialT1_5
- bpi_antisocialT1_6 ~~ bpi_antisocialT1_6
- bpi_antisocialT1_7 ~~ bpi_antisocialT1_7
-
- bpi_antisocialT2_1 ~~ bpi_antisocialT2_1
- bpi_antisocialT2_2 ~~ bpi_antisocialT2_2
- bpi_antisocialT2_3 ~~ bpi_antisocialT2_3
- bpi_antisocialT2_4 ~~ bpi_antisocialT2_4
- bpi_antisocialT2_5 ~~ bpi_antisocialT2_5
- bpi_antisocialT2_6 ~~ bpi_antisocialT2_6
- bpi_antisocialT2_7 ~~ bpi_antisocialT2_7
- 
- # Free intercepts of manifest variables
- bpi_antisocialT1_1 ~ intx1*1
- bpi_antisocialT1_2 ~ intx2*1
- bpi_antisocialT1_3 ~ intx3*1
- bpi_antisocialT1_4 ~ intx4*1
- bpi_antisocialT1_5 ~ intx5*1
- bpi_antisocialT1_6 ~ intx6*1
- bpi_antisocialT1_7 ~ intx7*1
-
- bpi_antisocialT2_1 ~ intx1*1
- bpi_antisocialT2_2 ~ intx2*1
- bpi_antisocialT2_3 ~ intx3*1
- bpi_antisocialT2_4 ~ intx4*1
- bpi_antisocialT2_5 ~ intx5*1
- bpi_antisocialT2_6 ~ intx6*1
- bpi_antisocialT2_7 ~ intx7*1
-'
-
-cfaModel_residualInvariance_ex <- '
- # Fix factor loadings to be the same across groups
- t1 =~ lambdax1*bpi_antisocialT1_1 + lambdax2*bpi_antisocialT1_2 + lambdax3*bpi_antisocialT1_3 + lambdax4*bpi_antisocialT1_4 + lambdax5*bpi_antisocialT1_5 + lambdax6*bpi_antisocialT1_6 + lambdax7*bpi_antisocialT1_7
- t2 =~ lambdax1*bpi_antisocialT2_1 + lambdax2*bpi_antisocialT2_2 + lambdax3*bpi_antisocialT2_3 + lambdax4*bpi_antisocialT2_4 + lambdax5*bpi_antisocialT2_5 + lambdax6*bpi_antisocialT2_6 + lambdax7*bpi_antisocialT2_7
- 
- # Fix latent means to zero in group 1; free latent means in group 2
- t1 ~ 0
- t2 ~ NA*1
- 
- # Fix latent variances to one in group 1; free latent variances in group 2
- t1 ~~ 1*t1
- t2 ~~ NA*t2
- 
- # Estimate covariances among latent variables
- t1 ~~ t2
- 
- # Estimate residual variances of manifest variables
- bpi_antisocialT1_1 ~~ residx1*bpi_antisocialT1_1
- bpi_antisocialT1_2 ~~ residx2*bpi_antisocialT1_2
- bpi_antisocialT1_3 ~~ residx3*bpi_antisocialT1_3
- bpi_antisocialT1_4 ~~ residx4*bpi_antisocialT1_4
- bpi_antisocialT1_5 ~~ residx5*bpi_antisocialT1_5
- bpi_antisocialT1_6 ~~ residx6*bpi_antisocialT1_6
- bpi_antisocialT1_7 ~~ residx7*bpi_antisocialT1_7
-
- bpi_antisocialT2_1 ~~ residx1*bpi_antisocialT2_1
- bpi_antisocialT2_2 ~~ residx2*bpi_antisocialT2_2
- bpi_antisocialT2_3 ~~ residx3*bpi_antisocialT2_3
- bpi_antisocialT2_4 ~~ residx4*bpi_antisocialT2_4
- bpi_antisocialT2_5 ~~ residx5*bpi_antisocialT2_5
- bpi_antisocialT2_6 ~~ residx6*bpi_antisocialT2_6
- bpi_antisocialT2_7 ~~ residx7*bpi_antisocialT2_7
- 
- # Free intercepts of manifest variables
- bpi_antisocialT1_1 ~ intx1*1
- bpi_antisocialT1_2 ~ intx2*1
- bpi_antisocialT1_3 ~ intx3*1
- bpi_antisocialT1_4 ~ intx4*1
- bpi_antisocialT1_5 ~ intx5*1
- bpi_antisocialT1_6 ~ intx6*1
- bpi_antisocialT1_7 ~ intx7*1
-
- bpi_antisocialT2_1 ~ intx1*1
- bpi_antisocialT2_2 ~ intx2*1
- bpi_antisocialT2_3 ~ intx3*1
- bpi_antisocialT2_4 ~ intx4*1
- bpi_antisocialT2_5 ~ intx5*1
- bpi_antisocialT2_6 ~ intx6*1
- bpi_antisocialT2_7 ~ intx7*1
-'
-
-configuralInvarianceModelFullSyntax_fit_ex <- lavaan(cfaModel_configuralInvariance_ex,
-               data = cnlsy,
-               missing = "ML",
-               estimator = "MLR")
-
-summary(configuralInvarianceModelFullSyntax_fit_ex,
-        fit.measures = TRUE,
-        standardized = TRUE,
-        rsquare = TRUE)
-
-fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)
-
-configuralInvarianceModelFitIndices_ex <- fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)[c("cfi.robust", "rmsea.robust", "srmr")]
-
-configuralInvarianceCFI <- as.numeric(fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)["cfi.robust"])
-configuralInvarianceRMSEA <- as.numeric(fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)["rmsea.robust"])
-configuralInvarianceSRMR <- as.numeric(fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)["srmr"])
-
-configuralInvarianceModel_chisquare_ex <- fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)[c("chisq.scaled")]
-configuralInvarianceModel_chisquareScaling_ex <- fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)[c("chisq.scaling.factor")]
-configuralInvarianceModel_df_ex <- fitMeasures(configuralInvarianceModelFullSyntax_fit_ex)[c("df.scaled")]
-configuralInvarianceModel_N_ex <- lavInspect(configuralInvarianceModelFullSyntax_fit_ex, what = "ntotal")
-
-equiv_chi(alpha = .05,
-          chi = configuralInvarianceModel_chisquare_ex,
-          df = configuralInvarianceModel_df_ex,
-          m = 2,
-          N_sample = configuralInvarianceModel_N_ex,
-          popRMSEA = .08)
-
-metricInvarianceModelFullSyntax_fit_ex <- lavaan(cfaModel_metricInvariance_ex,
-               data = cnlsy,
-               missing = "ML",
-               estimator = "MLR")
-
-summary(metricInvarianceModelFullSyntax_fit_ex,
-        fit.measures = TRUE,
-        standardized = TRUE,
-        rsquare = TRUE)
-
-fitMeasures(metricInvarianceModelFullSyntax_fit_ex)
-
-metricInvarianceAnova_ex <- anova(configuralInvarianceModelFullSyntax_fit_ex, metricInvarianceModelFullSyntax_fit_ex)
-metricInvarianceChiSquare_ex <- metricInvarianceAnova_ex$`Chisq diff`[2]
-metricInvarianceDF_ex <- metricInvarianceAnova_ex$`Df diff`[2]
-metricInvarianceP_ex <- metricInvarianceAnova_ex$`Pr(>Chisq)`[2]
-
-scalarInvarianceModelFullSyntax_fit_ex <- lavaan(cfaModel_scalarInvariance_ex,
-               data = cnlsy,
-               missing = "ML",
-               estimator = "MLR")
-
-summary(scalarInvarianceModelFullSyntax_fit_ex,
-        fit.measures = TRUE,
-        standardized = TRUE,
-        rsquare = TRUE)
-
-fitMeasures(scalarInvarianceModelFullSyntax_fit_ex)
-
-scalarInvarianceAnova_ex <- anova(metricInvarianceModelFullSyntax_fit_ex, scalarInvarianceModelFullSyntax_fit_ex)
-scalarInvarianceChiSquare_ex <- scalarInvarianceAnova_ex$`Chisq diff`[2]
-scalarInvarianceDF_ex <- scalarInvarianceAnova_ex$`Df diff`[2]
-scalarInvarianceP_ex <- scalarInvarianceAnova_ex$`Pr(>Chisq)`[2]
-
-residualInvarianceModelFullSyntax_fit_ex <- lavaan(cfaModel_residualInvariance_ex,
-               data = cnlsy,
-               missing = "ML",
-               estimator = "MLR")
-
-summary(residualInvarianceModelFullSyntax_fit_ex,
-        fit.measures = TRUE,
-        standardized = TRUE,
-        rsquare = TRUE)
-
-fitMeasures(residualInvarianceModelFullSyntax_fit_ex)
-
-residualInvarianceAnova_ex <- anova(scalarInvarianceModelFullSyntax_fit_ex, residualInvarianceModelFullSyntax_fit_ex)
-residualInvarianceChiSquare_ex <- residualInvarianceAnova_ex$`Chisq diff`[2]
-residualInvarianceDF_ex <- residualInvarianceAnova_ex$`Df diff`[2]
-residualInvarianceP_ex <- residualInvarianceAnova_ex$`Pr(>Chisq)`[2]
-```
-
-### Questions {#exercisesQuestions-bias}
-
-Note: Several of the following questions use data from the Children of the National Longitudinal Survey of Youth Survey (CNLSY).
-The CNLSY is a publicly available longitudinal data set provided by the Bureau of Labor Statistics (https://www.bls.gov/nls/nlsy79-children.htm#topical-guide; archived at https://perma.cc/EH38-HDRN).
-The CNLSY data file for these exercises is located on the book's page of the Open Science Framework (https://osf.io/3pwza).
-Children's behavior problems were rated in 1988 (time 1: T1) and then again in 1990 (time 2: T2) on the Behavior Problems Index (BPI).
-Below are the items corresponding to the Antisocial subscale of the BPI:
-
-1) cheats or tells lies
-2) bullies or is cruel/mean to others
-3) does not seem to feel sorry after misbehaving
-4) breaks things deliberately
-5) is disobedient at school
-6) has trouble getting along with teachers
-7) has sudden changes in mood or feeling
-
-1.
-    a. Determine whether there is predictive bias, as a function of sex, in predicting antisocial behavior at T2 using antisocial behavior at T2.
-Describe any predictive bias observed.
-    b. How could you address this predictive bias?
-2. Assume that children are selected to receive preventative services if their score on the Antisocial scale at T1 is > 6.
-Assume that children at T2 have an antisocial disorder if their score at T2 is > 6.
-Does the Antisocial scale show fairness in terms of equal outcomes between boys and girls?
-3. A lawyer argues in court that a test that is used to select students for college admissions should be able to be used because it has been demonstrated to show no evidence of bias against particular groups.
-However, you know that just because a measure may be unbiased does not mean that using the measure's scores for that purpose is fair.
-How could such a measure be unbiased yet unfair?
-4. Fit a multi-group [item response theory](#irt) model to the Antisocial subscale at time 2, with the participant's sex as a grouping factor.
-    a. Does a model with item parameters constrained across sexes fit significantly worse than a model with item parameters that are allowed to vary across sexes?
-    b. Starting with an unconstrained model that allows item parameters to vary across sexes, sequentially add constraints to item parameters across groups.
-Which items differed in discrimination across groups?
-Which items differed in severity across groups?
-Describe any differences.
-    c. How could any differential item functioning be addressed?
-5. Examine the longitudinal measurement invariance of the Antisocial scale across T1 and T2.
-Use full information maximum likelihood (FIML) to account for missing data.
-Use robust standard errors to account for non-normally distributed data.
-Which type(s) of longitudinal measurement invariance failed?
-Which items and parameters appeared to differ across ages?
-
-### Answers {#exercisesAnswers-bias}
-
-1.
-    a. There is predictive bias in terms of different slopes across sexes.
-The slope is steeper for boys than girls, indicating that the measure is not as predictively accurate for girls as it is for boys.
-    b. You could address this predictive bias by using a different predictive measure for girls than boys, changing the criterion, or by using within-group norming.
-2. No, the Antisocial scale does not show equal outcomes in terms of [selection rate](#selectionRatio).
-The selection ratio is much lower in girls $(`r apa(srBoys, decimals = 2)`)$ compared to boys $(`r apa(srGirls, decimals = 2)`)$.
-3. The measure could be unbiased if it shows the same intercepts and slopes across groups in predicting college performance.
-However, a measure can still be unfair even it is unbiased.
-If there are different types of errors in different groups, the measure may not be fair.
-For instance, if there are more false negative errors in Black applicants compared to White applicants and more false positive errors in White applicants than Black applicants, the measure would be unfair against Black applicants.
-Even if the percent accuracy of prediction is the same for Black and White applicants, the errors have different implications for each group—White applicants who would have failed in college are more likely to be accepted whereas strong Black applicants who would have succeeded are less likely to be accepted.
-To address the unfairness of the test, it will be important to use one of the various operationalizations of fairness: equal outcomes, equal opportunity, or equal odds.
-4.
-    a. The model with item parameters constrained across sexes fit significantly worse than a model with item parameters that were allowed to vary across sexes, $\chi^2[`r as.integer(unconstrainedVsConstrainedDF_ex)`] = `r apa(unconstrainedVsConstrainedChiSquare_ex, decimals = 2)`, p < .001$.
-This suggests that the item parameters show differential item functioning across boys and girls.
-    b. No items showed significant differences in discrimination across sexes, suggesting that items did not differ in their relation to the latent factor across boys and girls.
-Items 1, 2, 3, 4, 5, and 6 differed in severity across sexes.
-Items showed greater severity for girls than boys.
-It took a higher level of antisocial behavior for a girl to be endorsed as engaging in one of the following behaviors: cheats or tells lies, bullies or is cruel/mean to others, does not seem to feel sorry after misbehaving, breaks things deliberately, is disobedient at school, and has trouble getting along with teachers.
-    c. The differences in item severity across boys and girls could be addressed by resolving DIF.
-That is, the items that show severity DIF (items 1–6) would be allowed to differ in their severity parameter across boys and girls, but these items would be constrained to have the same discrimination across groups; non-DIF items would have severity and discrimination parameters constrained to be the same across groups.
-5. The configural invariance model fit well according to RMSEA $(`r apa(configuralInvarianceRMSEA, decimals = 2)`)$ and SRMR $(`r apa(configuralInvarianceSRMR, decimals = 2)`)$, but fit less well according to CFI $(`r apa(configuralInvarianceCFI, decimals = 2)`)$.
-The metric invariance model did not fit significantly worse than the configural invariance model $(\Delta\chi^2[`r as.integer(metricInvarianceDF_ex)`] = `r apa(metricInvarianceChiSquare_ex, decimals = 2)`, p = `r apa(metricInvarianceP_ex, decimals = 3)`)$.
-However, the scalar invariance model fit significantly worse than the metric invariance model $(\Delta\chi^2[`r as.integer(scalarInvarianceDF_ex)`] = `r apa(scalarInvarianceChiSquare_ex, decimals = 2)`, p = `r apa(scalarInvarianceP_ex, decimals = 3)`)$, and the residual invariance model fit significantly worse than the scalar invariance model $(\Delta\chi^2[`r as.integer(residualInvarianceDF_ex)`] = `r apa(residualInvarianceChiSquare_ex, decimals = 2)`, p < .001)$.
-Therefore, scalar and residual invariance failed.
-The following items showed larger intercepts at T1 compared to T2: items 1, 2, 3, 4, 5, and 7.
-Only item 6 showed larger intercepts at T2 than T1.
-The following items showed a larger residual at T1 compared to T2: items 2–7.
-Only item 1 showed a larger residual at T2 compared to T1.

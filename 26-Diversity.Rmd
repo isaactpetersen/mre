@@ -1,10 +1,8 @@
 # Cultural and Individual Diversity {#diversity}
 
 Like [ethics](#ethics), considerations of cultural and individual diversity are relevant to all of our domains as psychologists, including (but not limited to) research, teaching, assessment, intervention, and supervision.\index{diversity}
-As a result, I have discussed important considerations about diversity throughout the book, including the chapters on [validity](#validity), [evidence-based assessment](#evidence-based), and [test bias](#bias).\index{diversity}
-At the same time, given the importance of cultural and individual diversity, I also provide this section, which is devoted more fully to these issues within the assessment context.\index{diversity}
 Diverse samples provide stronger tests of theories and better generalizability of findings ([external validity](#externalValidity)).\index{diversity}
-On the assessment side, we need measures that provide us with the best information, and that are [reliable](#reliability) and [valid](#validity) for all people we use them with.\index{diversity}\index{reliability}\index{validity}
+In assessment, we need measures that provide us with the best information, and that are [reliable](#reliability) and [valid](#validity) for all people we use them with.\index{diversity}\index{reliability}\index{validity}
 Diversity is a broad concept, and it spans many dimensions of differences among people.\index{diversity}
 
 ## Terminology {#terminology-diversity}
@@ -120,7 +118,7 @@ The *ADDRESSING* model [@Hays2016] provides a framework to consider some of the 
 ADDRESSING is an acronym that stands for:\index{multicultural assessment}\index{diversity!ADDRESSING acronym}
 
 - **A**ge and generational differences\index{multicultural assessment}\index{diversity!ADDRESSING acronym}
-- **D**evelopmental or other <br/>\index{multicultural assessment}\index{diversity!ADDRESSING acronym}
+- **D**evelopmental or other $\\$ \index{multicultural assessment}\index{diversity!ADDRESSING acronym}
   **D**isability\index{multicultural assessment}\index{diversity!ADDRESSING acronym}
 - **R**eligion and spiritual orientation\index{multicultural assessment}\index{diversity!ADDRESSING acronym}
 - **E**thnic and racial identity\index{multicultural assessment}\index{diversity!ADDRESSING acronym}
@@ -137,7 +135,7 @@ In addition to the aspects of diversity identified in ADDRESSING, there are othe
 ### DSM-5 Cultural Formulation Interview {#dsm5CulturalFormulationInterview}
 
 The [Diagnostic and Statistical Manual of Mental Disorders](#dsm) (DSM) provides a framework for clinicians to organize cultural information about a client using the Cultural Formulation Interview [@LewisFernandez2014].\index{multicultural assessment}\index{Diagnostic and Statistical Manual of Mental Disorders}
-The Cultural Formulation Interview is a [semi-structured interview](#semiStructuredInterview) and is available here:\index{multicultural assessment}\index{Diagnostic and Statistical Manual of Mental Disorders}\index{interview!semi-structured} https://www.psychiatry.org/File%20Library/Psychiatrists/Practice/DSM/APA_DSM5_Cultural-Formulation-Interview.pdf (archived at https://perma.cc/3EWR-LGEN)
+The Cultural Formulation Interview is a [semi-structured interview](#semiStructuredInterview) and is available here:\index{multicultural assessment}\index{Diagnostic and Statistical Manual of Mental Disorders}\index{interview!semi-structured} https://www.psychiatry.org/File%20Library/Psychiatrists/Practice/DSM/APA_DSM5_Cultural-Formulation-Interview.pdf (archived at https://perma.cc/3EWR-LGEN).
 
 ### Multicultural Assessment Procedure {#multiculturalAssessmentProcedure}
 
@@ -231,7 +229,7 @@ Generally, researchers recommend controlling for social and demographic characte
 When comparing Black and White participants, it is important to control for group differences in socioeconomic status, especially in the U.S.\index{diversity!assessment of minority populations}
 
 In addition to main effects of group status, it may also be important to consider *interaction* effects of group status, consistent with an intersectionality approach.\index{diversity!assessment of minority populations}
-However, power to detect interactions tends to be weaker than power to detect main effects, both because of [smaller effect sizes](https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect) (archived at https://perma.cc/E3KA-SGB7) and because of smaller sample sizes of the intersecting groups.\index{diversity!assessment of minority populations}
+However, power to detect interactions tends to be weaker than power to detect main effects, both because of smaller effect sizes (https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect archived at https://perma.cc/E3KA-SGB7) and because of smaller sample sizes of the intersecting groups.\index{diversity!assessment of minority populations}
 
 #### Sampling {#sampling-diversity}
 
@@ -319,13 +317,13 @@ When no translator is available, then use a trained paraprofessional from the cl
 
 The APA has also published guidelines for working with particular groups, including:\index{diversity!assessment of minority populations}
 
-- groups based on [race and ethnicity](https://www.apa.org/about/policy/guidelines-race-ethnicity.pdf) (\index{diversity!assessment of minority populations}archived at https://perma.cc/4LM9-X6JN)
-- [people with low income](https://www.apa.org/about/policy/guidelines-low-income.pdf) (\index{diversity!assessment of minority populations}archived at https://perma.cc/PZQ5-8YFG)
-- [people with disabilities](https://www.apa.org/pi/disability/resources/assessment-disabilities) (\index{diversity!assessment of minority populations}archived at https://perma.cc/5YZ8-FNJT)
-- [people who are transgender or gender nonconforming](https://www.apa.org/practice/guidelines/transgender.pdf) (\index{diversity!assessment of minority populations}archived at https://perma.cc/E9VH-QG3W)
-- [sexual minorities](https://www.apa.org/about/policy/psychological-sexual-minority-persons.pdf) (\index{diversity!assessment of minority populations}archived at https://perma.cc/4BJD-QZCF)
-- [girls and women](https://www.apa.org/about/policy/psychological-practice-girls-women.pdf) (\index{diversity!assessment of minority populations}archived at https://perma.cc/AYA4-KB5W)
-- [boys and men](https://www.apa.org/about/policy/boys-men-practice-guidelines.pdf) (\index{diversity!assessment of minority populations}archived at https://perma.cc/6HWK-W9R6)
+- groups based on race and ethnicity\index{diversity!assessment of minority populations} (https://www.apa.org/about/policy/guidelines-race-ethnicity.pdf archived at https://perma.cc/4LM9-X6JN)
+- people with low income\index{diversity!assessment of minority populations} (https://www.apa.org/about/policy/guidelines-low-income.pdf archived at https://perma.cc/PZQ5-8YFG)
+- people with disabilities\index{diversity!assessment of minority populations} (https://www.apa.org/pi/disability/resources/assessment-disabilities archived at https://perma.cc/5YZ8-FNJT)
+- people who are transgender or gender nonconforming\index{diversity!assessment of minority populations} (https://www.apa.org/practice/guidelines/transgender.pdf archived at https://perma.cc/E9VH-QG3W)
+- sexual minorities\index{diversity!assessment of minority populations} (https://www.apa.org/about/policy/psychological-sexual-minority-persons.pdf archived at https://perma.cc/4BJD-QZCF)
+- girls and women\index{diversity!assessment of minority populations} (https://www.apa.org/about/policy/psychological-practice-girls-women.pdf archived at https://perma.cc/AYA4-KB5W)
+- boys and men\index{diversity!assessment of minority populations} (https://www.apa.org/about/policy/boys-men-practice-guidelines.pdf archived at https://perma.cc/6HWK-W9R6)
 
 ### Seek Training and Consultation {#trainingAndConsultation}
 

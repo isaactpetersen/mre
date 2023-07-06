@@ -1,4 +1,4 @@
-# (PART) Part I {-}
+\mainmatter
 
 # Introduction {#intro}
 
@@ -20,7 +20,7 @@ Learning important principles of assessment will put you in a better position to
 In this book, I apply a scientific perspective to the principles of psychological assessment.
 The assessments used in a given situation—whether in research or practice—should be supported by the strongest available science, or they should be used cautiously while undergoing development and study.
 In addition to discussing principles, however, I also provide analysis scripts in the software `R` [@R-base], so that you are able to apply the principles discussed in this book.\index{R}
-Some of the chapters includes analysis exercises (at the end of the chapter) for you to test your comprehension.
+Analysis exercises for each chapter are freely available in the online version of the book: https://isaactpetersen.github.io/Principles-Psychological-Assessment/
 
 ## Why R? {#whyR}
 
@@ -37,7 +37,7 @@ Regarding my background, I am a licensed clinical psychologist.
 My research examines how children develop behavior problems.
 I am also a trained clinician, and I supervise training clinicians in assessment and therapy, particularly assessment and treatment of children's disruptive behavior.
 Given my expertise, many of the examples in the book deal with topics in clinical psychology, but many of the assessment principles discussed are relevant to all areas of psychology—and science more broadly—and are often overlooked in research and practice.
-As a card-carrying clinical scientist, my perspective is that the scientific epistemology is the strongest approach to knowledge and that assessment should be guided first and foremost by the epistemology of science, regardless of whether one is doing research or practice.\index{clinical science}
+As a clinical scientist, my perspective is that the scientific epistemology is the strongest approach to knowledge and that assessment should be guided first and foremost by the epistemology of science, regardless of whether one is doing research or practice.\index{clinical science}
 
 ## What Is Assessment? {#whatIsAssessment}
 
@@ -179,7 +179,7 @@ Most of the `R` packages used in this book can be installed from the Comprehensi
 install.packages("INSERT_PACKAGE_NAME_HERE")
 ```
 
-Several of the packages are hosted on GitHub repositories, including `uroc` [@Gneiting2021], `dmacs` [@R-dmacs], and [`petersenlab`](https://github.com/DevPsyLab/petersenlab) [@R-petersenlab].\index{GitHub}\index{petersenlab package}
+Several of the packages are hosted on GitHub repositories, including `uroc` [@Gneiting2021], `dmacs` [@R-dmacs], and `petersenlab` [@R-petersenlab].\index{GitHub}\index{petersenlab package}
 
 You can install the `uroc` and `dmacs` packages using the following code:
 
@@ -189,8 +189,8 @@ remotes::install_github("evwalz/uroc")
 remotes::install_github("ddueber/dmacs")
 ```
 
-Many of the `R` functions used in this book are available from the [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab]\index{petersenlab package}: https://github.com/DevPsyLab/petersenlab.
-You can install the [`petersenlab`](https://github.com/DevPsyLab/petersenlab) package [@R-petersenlab] using the following code:\index{petersenlab package}
+Many of the `R` functions used in this book are available from the `petersenlab` package [@R-petersenlab]\index{petersenlab package}: https://github.com/DevPsyLab/petersenlab.
+You can install the `petersenlab` package [@R-petersenlab] using the following code:\index{petersenlab package}
 
 ```{r, eval = FALSE}
 install.packages("remotes")

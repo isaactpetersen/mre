@@ -8,7 +8,7 @@ There are other measurement theories that conceptualize [reliability](#reliabili
 One such measurement theory is generalizability theory [@Brennan1992], also known as G-theory and domain sampling theory.\index{generalizability theory}
 G-theory is also discussed in the chapters on [reliability](#reliability) (Chapter \@ref(reliability), Section \@ref(gTheoryReliability)), [validity](#validity) (Chapter \@ref(validity), Section \@ref(gTheoryValidity)) and [structural equation modeling](#sem) (Chapter \@ref(sem), Section \@ref(generalizability-SEM)).\index{generalizability theory}\index{reliability}\index{validity}\index{structural equation modeling}
 
-## Overview of Generalizability Theory (G-Theory) {#overview-gTheory}
+## Overview {#overview-gTheory}
 
 G-theory is an alternative measurement theory to CTT that does not treat all measurement differences across time, rater, or situation as "error" but rather as a phenomenon of interest [@Wiggins1973].\index{generalizability theory}\index{classical test theory}\index{measurement error}
 G-theory is a measurement theory that is used to examine the extent to which scores are consistent across a specific set of conditions.\index{generalizability theory}
@@ -51,18 +51,17 @@ This occurs through specifying many different variance facets in the estimation 
 This specification allows us to take into consideration variance due to occasion effects, item effects, and occasion $\times$ item effects (i.e., main effects of the facets in addition to their interaction), as in Table \@ref(tab:gTheoryTable).\index{generalizability theory}\index{measurement error}\index{measurement error}\index{generalizability theory!facet}
 
 ```{r, include = FALSE}
-gTheoryTable <- data.frame(
-  "source" = c("Person (p)", "Item (i)", "Occasion (o)", "p x i", "p x o", "i x o", "p x i x o", "residual"),
-  "percentVariance" = c(30, 5, 3, 25, 5, 2, 10, 20))
+gTheoryTable <- data.frame("source" = c("Person (p)", "Item (i)", "Occasion (o)", "p x i", "p x o", "i x o", "p x i x o", "residual"),
+                           "percentVariance" = c(30, 5, 3, 25, 5, 2, 10, 20))
 ```
 
 ```{r gTheoryTable, echo = FALSE}
-kable(
-  gTheoryTable,
-  col.names = c("Source","Variance Accounted For (%)"),
-  caption = "Percent of Variance from Different Sources in Generalizability Theory Model With Three Facets: Person, Item, and Occasion (and Their Interactions).
-  Adapted from @Webb2005, Table 1, p. 2. Webb, N. M., \\& Shavelson, R. J. (2005). Generalizability theory: Overview. In B. S. Everitt \\& D. C. Howell (Eds.), Encyclopedia of statistics in behavioral science (Vol. 2, pp. 717–719). John Wiley \\& Sons, Ltd. https://doi.org/10.1002/0470013192.bsa703",
-  booktabs = TRUE)
+kable(gTheoryTable,
+      col.names = c("Source","Variance Accounted For (%)"),
+      caption = "Percent of Variance from Different Sources in Generalizability Theory Model With Three Facets: Person, Item, and Occasion (and Their Interactions).
+      Adapted from Webb et al. (2005), Table 1, p. 2. Webb, N. M., \\& Shavelson, R. J. (2005). Generalizability theory: Overview. In B. S. Everitt \\& D. C. Howell (Eds.), Encyclopedia of statistics in behavioral science (Vol. 2, pp. 717–719). John Wiley \\& Sons, Ltd. https://doi.org/10.1002/0470013192.bsa703",
+      booktabs = TRUE,
+      linesep = "")
 ```
 
 A score's usefulness largely depends on the extent to which it allows us to generalize accurately to behavior in a wider set of situations—i.e., a universe of generalization.\index{generalizability theory}\index{generalizability theory!universe}
@@ -137,12 +136,14 @@ G-theory can be challenging because the researcher must specify, define, and ass
 ### Load Libraries {#loadLibraries-gTheory}
 
 ```{r}
-library("petersenlab") #to install: install.packages("remotes"); remotes::install_github("DevPsyLab/petersenlab")
+library("petersenlab")
 library("gtheory")
 library("MOTE")
+library("here")
 library("tidyverse")
 library("tinytex")
 library("knitr")
+library("kableExtra")
 library("rmarkdown")
 library("bookdown")
 ```
@@ -151,9 +152,7 @@ library("bookdown")
 
 #### Generate Data {#generateData-gTheory}
 
-For reproducibility, I set the seed below.\index{simulate data}
-Using the same seed will yield the same answer every time.
-There is nothing special about this particular seed.
+\index{simulate data}
 
 ```{r}
 set.seed(52242)
@@ -190,12 +189,20 @@ The examples are adapted from @Huebner2019.
 
 Universe scores for each person are generated using the following syntax and are presented in Table \@ref(tab:universeScores).\index{generalizability theory!universe score}
 
-```{r universeScores, echo = FALSE}
-pio_cross_dat %>%
+```{r}
+universeScores <- pio_cross_dat %>%
   group_by(Person) %>%
-  summarise(
-    universeScore = mean(Score, na.rm = TRUE),
-    .groups = "drop")
+  summarise(universeScore = mean(Score, na.rm = TRUE), .groups = "drop")
+```
+
+```{r universeScores, echo = FALSE}
+universeScores %>% 
+  rename("Universe Score" = universeScore) %>% 
+  kable(.,
+  caption = "Participants' Universe Scores.",
+  format = "latex",
+  booktabs = TRUE,
+  linesep = "")
 ```
 
 ### Generalizability ($G$) Study {#gStudy-example}
@@ -274,79 +281,3 @@ Generalizability theory can be a useful way of estimating multiple aspects of [r
 ## Suggested Readings {#readings-gTheory}
 
 @Brennan2001
-
-## Exercises {#exercises-gTheory}
-
-```{r, include = FALSE}
-library("tidyverse")
-library("here")
-library("MOTE")
-```
-
-```{r, include = FALSE}
-# Generalizability Theory -------------------------------------------------
-participant_ex <- rep(c(1,2,3), times = 6)
-occasion_ex <- rep(rep(c(1,2), each = 3), times = 3)
-rater_ex <- rep(c(1,2,3), each = 6)
-score_ex <- c(7,2,0,10,5,1,8,3,1,11,6,1,6,2,4,12,6,5)
-
-por_data_ex <- data.frame(participant_ex, occasion_ex, rater_ex, score_ex)
-
-universeScores_ex <- por_data_ex %>%
-  group_by(participant_ex) %>%
-  summarise(universeScore = mean(score_ex, na.rm = TRUE), .groups = "drop") #universe score for each participant
-
-person1_ex <- universeScores_ex$universeScore[which(universeScores_ex$participant_ex == 1)]
-person2_ex <- universeScores_ex$universeScore[which(universeScores_ex$participant_ex == 2)]
-person3_ex <- universeScores_ex$universeScore[which(universeScores_ex$participant_ex == 3)]
-
-PxOxR_ex <- gstudy(data = por_data_ex,
-                score_ex ~ (1|participant_ex) + (1|occasion_ex) + (1|rater_ex) +
-                  (1|participant_ex:occasion_ex) + (1|participant_ex:rater_ex) + (1|rater_ex:occasion_ex))
-
-varParticipant_ex <- PxOxR_ex$components$percent[which(PxOxR_ex$components$source == "participant_ex")]
-varRater_ex <- PxOxR_ex$components$percent[which(PxOxR_ex$components$source == "rater_ex")]
-varOccasion_ex <- PxOxR_ex$components$percent[which(PxOxR_ex$components$source == "occasion_ex")]
-varRaterXOccasion_ex <- PxOxR_ex$components$percent[which(PxOxR_ex$components$source == "rater_ex:occasion_ex")]
-
-#Calculate generalizability coefficients
-decisionStudy_ex <- dstudy(PxOxR_ex, colname.objects = "participant_ex", data = por_data_ex, colname.scores = "score_ex")
-decisionStudy_ex
-
-generalizabilityCoefficient_ex <- decisionStudy_ex$generalizability #analogous to reliability coefficient in classical test theory; uses relative error variance: relevant when relative (norm-referenced) decisions are made (e.g., percentiles)
-dependabilityCoefficient_ex <- decisionStudy_ex$dependability #analogous to reliability coefficient in classical test theory; uses absolute error variance: relevant when absolute decisions are made
-```
-
-### Questions {#exercisesQuestions-gTheory}
-
-1. You want to see how generalizable the Antisocial Behavior subscale of the BPI is.
-You conduct a generalizability study ("$G$ study") to see how generalizable the scores are across participants ($N = 3$), two measurement occasions, and three raters.
-What is the universe score (estimate of true score) for each participant?
-What percent of variance is attributable to: (a) individual differences among participants, (b) different raters, (c) the measurement occasions, and (d) the interactive effect of raters and measurement occasions?
-Using a decision study ("$D$ study"), what are the generalizability and dependability coefficients?
-Is the measure reliable across the universe (range of factors) we examined it in?
-Interpret the results from the G study and D study.
-The data from your study are in Table \@ref(tab:evaluatingGeneralizabilityTable) below:
-
-```{r, include = FALSE}
-por_data_ex2 <- por_data_ex
-
-names(por_data_ex2) <- c("Participant","Occasion","Rater","Score")
-```
-
-```{r evaluatingGeneralizabilityTable, echo = FALSE}
-kable(
-  por_data_ex2,
-  caption = "Exercise 12: Table of Example Data for Evaluating Generalizability of Scores Across Participants, Occasions, and Raters.",
-  booktabs = TRUE)
-```
-
-### Answers {#exercisesAnswers-gTheory}
-
-1. The universe score is $`r person1_ex`$, $`r person2_ex`$, and $`r person3_ex`$ for participants 1, 2, and 3, respectively.
-The percent of variance attributable to each of those factors is: (a) participant: $`r apa(varParticipant_ex, decimals = 1)`%$, (b) rater: $`r apa(varRater_ex, decimals = 1)`%$, (c) the measurement occasion: $`r apa(varOccasion_ex, decimals = 1)`%$, and (d) the interactive effect of rater and measurement occasion: $`r apa(varRaterXOccasion_ex, decimals = 1)`%$.
-The generalizability coefficient is $`r apa(generalizabilityCoefficient_ex, decimals = 2, leading = FALSE)`$, and the dependability coefficient is $`r apa(dependabilityCoefficient_ex, decimals = 2, leading = FALSE)`$.
-The measure is fairly reliable across the universe examined, both in terms of relative differences (generalizability coefficient) and absolute differences (dependability coefficient).
-However, when using the measure in future work, it would be important to assess many participants (due to the strong presence of individual differences) across multiple occasions (due to the strong effect of occasion) and multiple raters (due to the moderated effect of rater as a function of participant).
-It will be important to account for the considerable sources of variance in scores on the measure in future work including: participant, occasion, participant $\times$ rater, and participant $\times$ occasion.
-By accounting for these sources of variance, we can get a purer estimate of each participant's true score and the population's true score.

@@ -1,12 +1,9 @@
 bookdown::gitbook:
-  split_by: chapter
-  css: style.css
-  toc_depth: 5
-  df_print: paged
-  code_folding: show
+  css: css/style.css
+  pandoc_args: [ "--csl", "apa.csl" ]
   config:
     toc:
-      collapse: section
+      collapse: none
       before: |
         <li><a href="./">Principles of Psychological Assessment</a></li>
       after: |
@@ -15,20 +12,29 @@ bookdown::gitbook:
         <li><a href="https://github.com/isaactpetersen/Principles-Psychological-Assessment/pulls" target="blank">Create a GitHub Pull Request</a></li>
     download: false
     edit: https://github.com/isaactpetersen/Principles-Psychological-Assessment/edit/main/%s
-  includes:
-    in_header:
-    - "includes/hypothesis.html"
-    - "includes/google_analytics.html"
-    before_body:
-    - "includes/open-review.html"
-    after_body:
-    - "includes/disqus.html"
-    - "includes/email_submit.html"
-    - "includes/footer.html"
+    sharing:
+      github: true
+      facebook: false
 bookdown::pdf_book:
   includes:
-    in_header: preamble.tex
+    in_header: latex/preamble.tex
+    before_body: latex/before_body.tex
+    after_body: latex/after_body.tex
+  keep_tex: true
+  dev: "cairo_pdf"
   latex_engine: xelatex
-  citation_package: natbib
-  keep_tex: yes
-bookdown::epub_book: default
+  citation_package: none
+  template: null
+  pandoc_args: [ "--csl", "apa.csl", "--top-level-division=chapter" ]
+  toc_depth: 2
+  toc_unnumbered: false
+  toc_appendix: true
+  quote_footer: ["\\VA{", "}{}"]
+  highlight_bw: true
+bookdown::epub_book:
+  stylesheet: css/style.css
+  pandoc_args: [ "--csl", "apa.csl" ]
+  toc: TRUE
+  toc_depth: 2
+  cover_image: "Images/cover.png"
+
