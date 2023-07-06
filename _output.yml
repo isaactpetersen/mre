@@ -1,5 +1,4 @@
 bookdown::gitbook:
-  css: css/style.css
   pandoc_args: [ "--csl", "apa.csl" ]
 bookdown::pdf_book:
   includes:
@@ -18,7 +17,5 @@ bookdown::pdf_book:
   quote_footer: ["\\VA{", "}{}"]
   highlight_bw: true
 bookdown::epub_book:
-  stylesheet: css/style.css
   pandoc_args: [ "--csl", "apa.csl" ]
   toc: TRUE
-  toc_depth: 2
