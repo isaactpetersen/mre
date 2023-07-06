@@ -2,7 +2,4 @@ Package: placeholder
 Title: book
 Version: 1.0.5
 Imports:
-  bookdown,
-  petersenlab
-Remotes:
-  DevPsyLab/petersenlab
+  bookdown
